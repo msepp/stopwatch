@@ -1,0 +1,104 @@
+<h1>
+  {{title}}
+</h1>
+
+<div *ngIf="activeTask">
+  <h3>Now running {{activeTask.name}}</h3>
+</div>
+
+<div *ngIf="versions; then versionTable else loadingVersions"></div>
+<ng-template #versionTable>
+  <h3>Version data</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>App</th>
+        <th>Build</th>
+        <th>Electron</th>
+        <th>Astilectron</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{versions.app}}</td>
+        <td>{{versions.build}}</td>
+        <td>{{versions.electron}}</td>
+        <td>{{versions.astilectron}}</td>
+      </tr>
+    </tbody>
+  </table>
+</ng-template>
+
+<ng-template #loadingVersions>
+  Loading, just a moment...
+</ng-template>
+
+<div *ngIf="projects; then projectsTable else loadingProjects"></div>
+<ng-template #projectsTable>
+  <h3>Projects</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of projects">
+        <td>{{p.id}}</td>
+        <td>{{p.name}}</td>
+        <td><button (click)="selectProject(p)">select</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>Add project</h4>
+  <form [formGroup]="newProject" (submit)="addProject()" novalidate>
+    <p class="error" *ngIf="newProject.get('name').invalid && newProject.get('name').touched">
+      Name must be given
+    </p>
+    <input type="text" name="name" formControlName="name" />
+    <button type="submit">Add</button>
+  </form>
+
+  <h3>Tasks</h3>
+  <div *ngIf="activeProject">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Cost code</th>
+          <th>Time used</th>
+          <th>Running since</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of tasks">
+          <td>{{t.id}}</td>
+          <td>{{t.name}}</td>
+          <td>{{t.costcode}}</td>
+          <td>{{t.duration}}</td>
+          <td>{{t.running}}</td>
+          <td><button (click)="toggleTask(t)">toggle</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <form [formGroup]="newTask" (submit)="addTask()" novalidate>
+      <p class="error" *ngIf="newTask.get('name').invalid && newTask.get('name').touched">
+        Name must be given
+      </p>
+      <div>
+        <input type="text" name="name" formControlName="name" />
+      </div>
+      <div>
+        <input type="text" name="costcode" formControlName="costcode" />
+      </div>
+      <button type="submit">Add</button>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #loadingProjects>
+  Loading, just a moment...
+</ng-template>
