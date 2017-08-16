@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
 	"path"
 
 	"github.com/msepp/stopwatch/bootstrap"
@@ -19,14 +18,14 @@ func HandleGUIMessage(msg *message.Message) (interface{}, error) {
 	case message.RequestOpenDatabase:
 		return HandleOpenDatabase(msg)
 
-	case message.RequestProjects:
-		return HandleGetProjects(msg)
+	case message.RequestConfig:
+		return HandleGetConfig(msg)
 
-	case message.RequestProjectTasks:
-		return HandleGetProjectTasks(msg)
+	case message.RequestGroupTasks:
+		return HandleGetGroupTasks(msg)
 
-	case message.RequestAddProject:
-		return HandleAddProject(msg)
+	case message.RequestAddGroup:
+		return HandleAddGroup(msg)
 
 	case message.RequestAddTask:
 		return HandleAddTask(msg)
@@ -77,8 +76,8 @@ func HandleOpenDatabase(msg *message.Message) (interface{}, error) {
 	return nil, nil
 }
 
-// HandleGetProjects returns current list of projects
-func HandleGetProjects(msg *message.Message) (interface{}, error) {
+// HandleGetConfig returns app config and last known state
+func HandleGetConfig(msg *message.Message) (interface{}, error) {
 	if gState.app.SetOpRunning(true) == false {
 		return nil, errors.New("backend busy")
 	}
@@ -88,10 +87,10 @@ func HandleGetProjects(msg *message.Message) (interface{}, error) {
 		return nil, fmt.Errorf("no database")
 	}
 
-	// Retrieve projects
-	plist, err := gState.db.ReadProjects()
+	// Retrieve groups
+	groups, err := gState.db.ReadGroups()
 	if err != nil {
-		return nil, fmt.Errorf("Unable to read projects: %s", err)
+		return nil, fmt.Errorf("Unable to read groups: %s", err)
 	}
 
 	// Get active task
@@ -100,13 +99,14 @@ func HandleGetProjects(msg *message.Message) (interface{}, error) {
 		return nil, fmt.Errorf("Unable to read active task: %s", err)
 	}
 
-	return map[string]interface{}{
-		"projects": plist, "activeTask": at,
+	return &Config{
+		Groups:     groups,
+		ActiveTask: at,
 	}, nil
 }
 
-// HandleGetProjectTasks returns list of tasks for a project
-func HandleGetProjectTasks(msg *message.Message) (interface{}, error) {
+// HandleGetGroupTasks returns list of tasks for a group
+func HandleGetGroupTasks(msg *message.Message) (interface{}, error) {
 	if gState.app.SetOpRunning(true) == false {
 		return nil, errors.New("backend busy")
 	}
@@ -116,13 +116,13 @@ func HandleGetProjectTasks(msg *message.Message) (interface{}, error) {
 		return nil, fmt.Errorf("no database")
 	}
 
-	var projectID int
-	if mdata, ok := msg.DataMap(); ok {
-		projectID, _ = mdata.GetInt("projectid")
+	var payload ReqPayloadGetGroupTasks
+	if err := msg.Into(&payload); err != nil || payload.GroupID <= 0 {
+		return nil, fmt.Errorf("payload invalid or missing: %s", err)
 	}
 
 	// Retrieve tasks
-	tlist, err := gState.db.ReadTasks(projectID)
+	tlist, err := gState.db.ReadTasks(payload.GroupID)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to read tasks: %s", err)
 	}
@@ -130,8 +130,8 @@ func HandleGetProjectTasks(msg *message.Message) (interface{}, error) {
 	return tlist, nil
 }
 
-// HandleAddProject adds the project detailed in msg data
-func HandleAddProject(msg *message.Message) (interface{}, error) {
+// HandleAddGroup adds the group detailed in msg data
+func HandleAddGroup(msg *message.Message) (interface{}, error) {
 	if gState.app.SetOpRunning(true) == false {
 		return nil, errors.New("backend busy")
 	}
@@ -141,24 +141,20 @@ func HandleAddProject(msg *message.Message) (interface{}, error) {
 		return nil, fmt.Errorf("no database")
 	}
 
-	var name string
-	if mdata, ok := msg.DataMap(); ok {
-		name, _ = mdata.GetString("name")
+	var payload ReqPayloadAddGroup
+	if err := msg.Into(&payload); err != nil || payload.Name == "" {
+		return nil, fmt.Errorf("payload invalid or missing: %s", err)
 	}
 
-	if name == "" {
-		return nil, fmt.Errorf("name must be given and not empty")
-	}
-
-	p, err := gState.db.AddProject(name)
+	p, err := gState.db.AddGroup(payload.Name)
 	if err != nil {
-		return nil, fmt.Errorf("failed to add project: %s", err)
+		return nil, fmt.Errorf("failed to add group: %s", err)
 	}
 
 	return p, nil
 }
 
-// HandleAddTask adds a task for a project using details from msg data
+// HandleAddTask adds a task for a group using details from msg data
 func HandleAddTask(msg *message.Message) (interface{}, error) {
 	if gState.app.SetOpRunning(true) == false {
 		return nil, errors.New("backend busy")
@@ -169,24 +165,19 @@ func HandleAddTask(msg *message.Message) (interface{}, error) {
 		return nil, fmt.Errorf("no database")
 	}
 
-	var name string
-	var costcode string
-	var projectID int
-
-	if mdata, ok := msg.DataMap(); ok {
-		name, _ = mdata.GetString("name")
-		projectID, _ = mdata.GetInt("projectid")
-		costcode, _ = mdata.GetString("costcode")
+	var payload ReqPayloadAddTask
+	if err := msg.Into(&payload); err != nil {
+		return nil, fmt.Errorf("payload invalid: %s", err)
 	}
 
-	if name == "" {
+	if payload.Name == "" {
 		return nil, fmt.Errorf("name must be given and not empty")
 	}
-	if projectID <= 0 {
-		return nil, fmt.Errorf("projectid must be a non-zero positive integer")
+	if payload.GroupID <= 0 {
+		return nil, fmt.Errorf("groupid must be a non-zero positive integer")
 	}
 
-	t, err := gState.db.AddTask(projectID, name, costcode)
+	t, err := gState.db.AddTask(payload.GroupID, payload.Name, payload.CostCode)
 	if err != nil {
 		return nil, fmt.Errorf("failed to add task: %s", err)
 	}
@@ -205,18 +196,17 @@ func HandleStartTask(msg *message.Message) (interface{}, error) {
 		return nil, fmt.Errorf("no database")
 	}
 
-	var projectID int
-	var taskID int
-
-	if mdata, ok := msg.DataMap(); ok {
-		projectID, _ = mdata.GetInt("projectid")
-		taskID, _ = mdata.GetInt("id")
+	var payload ReqPayloadSetTaskStatus
+	if err := msg.Into(&payload); err != nil {
+		return nil, fmt.Errorf("payload invalid: %s", err)
 	}
 
-	log.Printf("pid: %d, tid: %d", projectID, taskID)
+	if payload.GroupID <= 0 || payload.TaskID <= 0 {
+		return nil, fmt.Errorf("group and task IDs must be non-zero positive integers")
+	}
 
 	// Locate task
-	task, err := gState.db.GetTask(projectID, taskID)
+	task, err := gState.db.GetTask(payload.GroupID, payload.TaskID)
 	if err != nil {
 		return nil, fmt.Errorf("failure starting task: %s", err)
 	}
@@ -228,23 +218,23 @@ func HandleStartTask(msg *message.Message) (interface{}, error) {
 
 	// Stop active task if not the same as current task
 	if activeTask != nil {
-		if activeTask.ID == task.ID && activeTask.ProjectID == task.ProjectID {
+		if activeTask.ID == task.ID && activeTask.GroupID == task.GroupID {
 			if activeTask.Running != nil {
 				return activeTask, nil
 			}
 		} else {
-			if _, err = gState.db.StopTask(activeTask.ProjectID, activeTask.ID); err != nil {
+			if _, err = gState.db.StopTask(activeTask.GroupID, activeTask.ID); err != nil {
 				return nil, fmt.Errorf("unable to stop current task: %s", err)
 			}
 		}
 	}
 
-	if err = gState.db.SetActiveTask(task.ProjectID, task.ID); err != nil {
+	if err = gState.db.SetActiveTask(task.GroupID, task.ID); err != nil {
 		return nil, fmt.Errorf("unable to set active task: %s", err)
 	}
 
 	// Mark running
-	return gState.db.StartTask(task.ProjectID, task.ID)
+	return gState.db.StartTask(task.GroupID, task.ID)
 }
 
 // HandleStopTask stops a task
@@ -258,16 +248,17 @@ func HandleStopTask(msg *message.Message) (interface{}, error) {
 		return nil, fmt.Errorf("no database")
 	}
 
-	var projectID int
-	var taskID int
+	var payload ReqPayloadSetTaskStatus
+	if err := msg.Into(&payload); err != nil {
+		return nil, fmt.Errorf("payload invalid: %s", err)
+	}
 
-	if mdata, ok := msg.DataMap(); ok {
-		projectID, _ = mdata.GetInt("projectid")
-		taskID, _ = mdata.GetInt("id")
+	if payload.GroupID <= 0 || payload.TaskID <= 0 {
+		return nil, fmt.Errorf("group and task IDs must be non-zero positive integers")
 	}
 
 	// Locate task
-	task, err := gState.db.GetTask(projectID, taskID)
+	task, err := gState.db.GetTask(payload.GroupID, payload.TaskID)
 	if err != nil {
 		return nil, fmt.Errorf("failure stopping task: %s", err)
 	}
@@ -280,7 +271,7 @@ func HandleStopTask(msg *message.Message) (interface{}, error) {
 
 	// Stop active task if it matches the given task
 	if activeTask != nil {
-		if activeTask.ID == task.ID && activeTask.ProjectID == task.ProjectID {
+		if activeTask.ID == task.ID && activeTask.GroupID == task.GroupID {
 			if err := gState.db.SetActiveTask(0, 0); err != nil {
 				return nil, fmt.Errorf("unable to clear active task: %s")
 			}
@@ -288,5 +279,5 @@ func HandleStopTask(msg *message.Message) (interface{}, error) {
 	}
 
 	// Mark running
-	return gState.db.StopTask(task.ProjectID, task.ID)
+	return gState.db.StopTask(task.GroupID, task.ID)
 }

@@ -1,7 +1,7 @@
 package main
 
-// Project defines a single project meta data
-type Project struct {
+// Group defines a single group
+type Group struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }

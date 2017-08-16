@@ -14,21 +14,15 @@ import (
 
 // bucket names
 const (
-	bucketTasks    = "tasks"
-	bucketProjects = "projects"
-	bucketState    = "state"
-	bucketSlices   = "slices"
+	bucketTasks  = "tasks"
+	bucketGroups = "groups"
+	bucketState  = "state"
+	bucketSlices = "slices"
 )
 
 // StopwatchDB is a handle for accessing a stopwatch database
 type StopwatchDB struct {
 	db *bolt.DB
-}
-
-// ActiveTask identifies currently active task
-type ActiveTask struct {
-	ProjectID int
-	TaskID    int
 }
 
 // NewStopwatchDB return an initialized stopwatch db
@@ -41,24 +35,24 @@ func (db *StopwatchDB) IsOpen() bool {
 	return db.db != nil
 }
 
-// AddTask adds a task for project, using given cost code to classify time spent
-func (db *StopwatchDB) AddTask(project int, task, costcode string) (*Task, error) {
+// AddTask adds a task for group, using given cost code to classify time spent
+func (db *StopwatchDB) AddTask(group int, task, costcode string) (*Task, error) {
 	if db.IsOpen() == false {
 		return nil, errors.New("database not ready")
 	}
 
-	var t *Task = NewTask(project, task, costcode)
+	var t *Task = NewTask(group, task, costcode)
 
 	// Generate new task, return task.
 	err := db.db.Update(func(tx *bolt.Tx) error {
-		bt := tx.Bucket([]byte(bucketTasks)).Bucket(itob(project))
+		bt := tx.Bucket([]byte(bucketTasks)).Bucket(itob(group))
 
 		// Next task ID
 		id, _ := bt.NextSequence()
 		t.ID = int(id)
 
 		// Create bucket for task slices
-		sliceID := bytes.Join([][]byte{itob(project), itob(t.ID)}, []byte("-"))
+		sliceID := bytes.Join([][]byte{itob(group), itob(t.ID)}, []byte("-"))
 		_, err := tx.Bucket([]byte(bucketSlices)).CreateBucketIfNotExists(sliceID)
 		if err != nil {
 			return err
@@ -79,29 +73,28 @@ func (db *StopwatchDB) AddTask(project int, task, costcode string) (*Task, error
 	return t, nil
 }
 
-// AddProject adds a project, using given name
-func (db *StopwatchDB) AddProject(project string) (*Project, error) {
+// AddGroup adds a group, using given name
+func (db *StopwatchDB) AddGroup(group string) (*Group, error) {
 	if db.IsOpen() == false {
 		return nil, errors.New("database not ready")
 	}
 
-	var p *Project = &Project{Name: project}
+	var p *Group = &Group{Name: group}
 
-	// Generate new project and return it
+	// Generate new group and return it
 	err := db.db.Update(func(tx *bolt.Tx) error {
-		bp := tx.Bucket([]byte(bucketProjects))
+		bp := tx.Bucket([]byte(bucketGroups))
 
 		// get next ID
 		id, _ := bp.NextSequence()
 		p.ID = int(id)
 
-		// Create bucket for the project tasks
+		// Create bucket for the group tasks
 		_, err := tx.Bucket([]byte(bucketTasks)).CreateBucketIfNotExists(itob(p.ID))
 		if err != nil {
 			return err
 		}
 
-		// Add new project to projects
 		buf, err := json.Marshal(p)
 		if err != nil {
 			return err
@@ -117,16 +110,16 @@ func (db *StopwatchDB) AddProject(project string) (*Project, error) {
 }
 
 // GetTask returns one task details
-func (db *StopwatchDB) GetTask(project, task int) (*Task, error) {
+func (db *StopwatchDB) GetTask(group, task int) (*Task, error) {
 	if db.IsOpen() == false {
 		return nil, errors.New("database not ready")
 	}
 
 	var t Task
 	err := db.db.View(func(tx *bolt.Tx) error {
-		bt := tx.Bucket([]byte(bucketTasks)).Bucket(itob(project))
+		bt := tx.Bucket([]byte(bucketTasks)).Bucket(itob(group))
 		if bt == nil {
-			return errors.New("project not found")
+			return errors.New("group not found")
 		}
 
 		v := bt.Get(itob(task))
@@ -141,12 +134,12 @@ func (db *StopwatchDB) GetTask(project, task int) (*Task, error) {
 }
 
 // StartTask marks tasks start
-func (db *StopwatchDB) StartTask(project, task int) (*Task, error) {
+func (db *StopwatchDB) StartTask(group, task int) (*Task, error) {
 	if db.IsOpen() == false {
 		return nil, errors.New("database not ready")
 	}
 
-	t, err := db.GetTask(project, task)
+	t, err := db.GetTask(group, task)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +149,7 @@ func (db *StopwatchDB) StartTask(project, task int) (*Task, error) {
 	var now time.Time
 	err = db.db.Update(func(tx *bolt.Tx) error {
 		// Create bucket for task slices
-		sliceID := bytes.Join([][]byte{itob(project), itob(task)}, []byte("-"))
+		sliceID := bytes.Join([][]byte{itob(group), itob(task)}, []byte("-"))
 		b := tx.Bucket([]byte(bucketSlices)).Bucket(sliceID)
 
 		if b == nil {
@@ -185,14 +178,14 @@ func (db *StopwatchDB) StartTask(project, task int) (*Task, error) {
 }
 
 // StopTask marks task stop event
-func (db *StopwatchDB) StopTask(project, task int) (*Task, error) {
+func (db *StopwatchDB) StopTask(group, task int) (*Task, error) {
 	if db.IsOpen() == false {
 		return nil, errors.New("database not ready")
 	}
 
 	var d time.Duration
 
-	t, err := db.GetTask(project, task)
+	t, err := db.GetTask(group, task)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +194,7 @@ func (db *StopwatchDB) StopTask(project, task int) (*Task, error) {
 	// is yet set.
 	err = db.db.Update(func(tx *bolt.Tx) error {
 		// Create bucket for task slices
-		sliceID := bytes.Join([][]byte{itob(project), itob(task)}, []byte("-"))
+		sliceID := bytes.Join([][]byte{itob(group), itob(task)}, []byte("-"))
 		b := tx.Bucket([]byte(bucketSlices)).Bucket(sliceID)
 
 		if b == nil {
@@ -239,9 +232,9 @@ func (db *StopwatchDB) SaveTask(task *Task) error {
 	}
 
 	return db.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(bucketTasks)).Bucket(itob(task.ProjectID))
+		b := tx.Bucket([]byte(bucketTasks)).Bucket(itob(task.GroupID))
 		if b == nil {
-			return errors.New("project not found")
+			return errors.New("group not found")
 		}
 
 		buf, _ := json.Marshal(task)
@@ -277,15 +270,15 @@ func (db *StopwatchDB) GetActiveTask() (*Task, error) {
 	}
 
 	log.Printf("getactive: %+v", at)
-	if at.ProjectID == 0 && at.TaskID == 0 {
+	if at.GroupID == 0 && at.TaskID == 0 {
 		return nil, nil
 	}
 
-	return db.GetTask(at.ProjectID, at.TaskID)
+	return db.GetTask(at.GroupID, at.TaskID)
 }
 
 // SetActiveTask sets currently active task, if one is set
-func (db *StopwatchDB) SetActiveTask(project, task int) error {
+func (db *StopwatchDB) SetActiveTask(group, task int) error {
 	if db.IsOpen() == false {
 		return errors.New("database not ready")
 	}
@@ -293,7 +286,7 @@ func (db *StopwatchDB) SetActiveTask(project, task int) error {
 	return db.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucketState))
 
-		at := ActiveTask{ProjectID: project, TaskID: task}
+		at := ActiveTask{GroupID: group, TaskID: task}
 		buf, err := json.Marshal(at)
 		if err != nil {
 			return err
@@ -304,17 +297,17 @@ func (db *StopwatchDB) SetActiveTask(project, task int) error {
 	})
 }
 
-// ReadProjects returns all users projects
-func (db *StopwatchDB) ReadProjects() ([]Project, error) {
+// ReadGroups returns all groups
+func (db *StopwatchDB) ReadGroups() ([]Group, error) {
 	if db.IsOpen() == false {
 		return nil, errors.New("database not ready")
 	}
 
-	res := []Project{}
+	res := []Group{}
 
 	db.db.View(func(tx *bolt.Tx) error {
-		return tx.Bucket([]byte(bucketProjects)).ForEach(func(k []byte, v []byte) error {
-			var p Project
+		return tx.Bucket([]byte(bucketGroups)).ForEach(func(k []byte, v []byte) error {
+			var p Group
 			json.Unmarshal(v, &p)
 			res = append(res, p)
 			return nil
@@ -324,8 +317,8 @@ func (db *StopwatchDB) ReadProjects() ([]Project, error) {
 	return res, nil
 }
 
-// ReadTasks return all tasks for a project
-func (db *StopwatchDB) ReadTasks(project int) ([]*Task, error) {
+// ReadTasks return all tasks for a group
+func (db *StopwatchDB) ReadTasks(group int) ([]*Task, error) {
 	if db.IsOpen() == false {
 		return nil, errors.New("database not ready")
 	}
@@ -335,7 +328,7 @@ func (db *StopwatchDB) ReadTasks(project int) ([]*Task, error) {
 	db.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucketTasks))
 
-		return b.Bucket(itob(project)).ForEach(func(k []byte, v []byte) error {
+		return b.Bucket(itob(group)).ForEach(func(k []byte, v []byte) error {
 			var t Task
 			json.Unmarshal(v, &t)
 			res = append(res, &t)
@@ -394,7 +387,7 @@ func (db *StopwatchDB) Open(path string) error {
 	}
 
 	if err = db.db.Update(func(tx *bolt.Tx) error {
-		_, err = tx.CreateBucketIfNotExists([]byte(bucketProjects))
+		_, err = tx.CreateBucketIfNotExists([]byte(bucketGroups))
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
