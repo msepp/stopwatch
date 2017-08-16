@@ -15,5 +15,4 @@ export class Clear implements Action {
   constructor() {}
 }
 
-
 export type All = Clear | Set;

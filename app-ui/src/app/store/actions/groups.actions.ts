@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Action, Store} from '@ngrx/store';
-import {Actions, Effect} from '@ngrx/effects';
+import {Action} from '@ngrx/store';
 import {Group} from '../../model/group';
 
 export const SET_GROUPS = '[groups] SET';
@@ -15,4 +14,10 @@ export class Add implements Action {
   constructor(public payload: Group) {}
 }
 
-export type All = Set | Add;
+export const LOAD_GROUPS = '[groups] LOAD';
+export class Load implements Action {
+  readonly type = LOAD_GROUPS;
+  constructor(public payload?: any) {}
+}
+
+export type All = Set | Add | Load;

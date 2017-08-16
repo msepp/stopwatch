@@ -1,4 +1,3 @@
-export * from './app-config';
 export * from './app-state';
 export * from './app-version';
 export * from './group';

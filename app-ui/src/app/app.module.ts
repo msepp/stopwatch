@@ -10,20 +10,17 @@ import { AppComponent } from './app.component';
 import { AstilectronModule } from './astilectron';
 import { StopwatchService } from './services/stopwatch.service';
 
+import './rxjs-operators';
+
 // Store reducers
 import { ActiveTaskReducer } from './store/reducers/active-task.reducers';
+import { BackendConnReducer } from './store/reducers/backend-conn.reducers';
 import { GroupTasksReducer } from './store/reducers/group-tasks.reducers';
 import { GroupsReducer } from './store/reducers/groups.reducers';
 import { SelectedGroupReducer } from './store/reducers/selected-group.reducers';
 import { SelectedTaskReducer } from './store/reducers/selected-task.reducers';
 import { VersionReducer } from './store/reducers/version.reducers';
 
-// Store effects
-import { ActiveTaskEffects } from './store/effects/active-task.effects';
-import { GroupTasksEffects } from './store/effects/group-tasks.effects';
-import { GroupsEffects } from './store/effects/groups.effects';
-import { SelectedGroupEffects } from './store/effects/selected-group.effects';
-import { SelectedTaskEffects } from './store/effects/selected-task.effects';
 @NgModule({
   declarations: [
     AppComponent
@@ -34,6 +31,7 @@ import { SelectedTaskEffects } from './store/effects/selected-task.effects';
     HttpModule,
     BrowserAnimationsModule,
     StoreModule.forRoot({
+      backendConn: BackendConnReducer,
       selectedGroup: SelectedGroupReducer,
       selectedTask: SelectedTaskReducer,
       activeTask: ActiveTaskReducer,
@@ -41,13 +39,7 @@ import { SelectedTaskEffects } from './store/effects/selected-task.effects';
       groupTasks: GroupTasksReducer,
       version: VersionReducer
     }),
-    EffectsModule.forRoot([
-      ActiveTaskEffects,
-      GroupTasksEffects,
-      GroupsEffects,
-      SelectedGroupEffects,
-      SelectedTaskEffects
-    ]),
+    EffectsModule.forRoot([]),
     AstilectronModule
   ],
   providers: [

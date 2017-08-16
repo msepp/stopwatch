@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Action, Store} from '@ngrx/store';
-import {Actions, Effect} from '@ngrx/effects';
+import {Action} from '@ngrx/store';
 
 @Injectable()
 export class SelectedTaskActions {

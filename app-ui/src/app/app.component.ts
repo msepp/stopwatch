@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Astilectron, Message } from './astilectron';
 import { Store } from '@ngrx/store';
 import { AppState } from './model/app-state';
 import { Observable } from 'rxjs/Observable';
@@ -14,6 +13,7 @@ import * as message from './astilectron/message';
 import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { AppVersion, Group, Task } from './model';
+import { StopwatchService } from './services/stopwatch.service';
 
 @Component({
   selector: 'app-root',
@@ -29,12 +29,10 @@ export class AppComponent implements OnInit {
   public tasks: Observable<Task[]>;
   public newGroup: FormGroup;
   public newTask: FormGroup;
-
-  public groupID: number;
-  public taskID: number;
+  public backendReady: Observable<boolean>;
 
   constructor(
-    private asti: Astilectron,
+    private stopwatch: StopwatchService,
     private fb: FormBuilder,
     private store: Store<AppState>
   ) {
@@ -43,10 +41,12 @@ export class AppComponent implements OnInit {
     });
 
     this.newTask = this.fb.group({
+      groupid: 0,
       name: ['', Validators.required],
       costcode: ''
     });
 
+    this.backendReady = this.store.select('backendConn');
     this.versions = this.store.select('version');
     this.groups = this.store.select('groups');
     this.tasks = this.store.select('groupTasks');
@@ -55,145 +55,46 @@ export class AppComponent implements OnInit {
 
     this.selectedGroup.subscribe((v: Group) => {
       if (v) {
-        this.groupID = v.id;
+        this.newTask.get('groupid').setValue(v.id);
       }
     });
 
-    this.activeTask.subscribe((v: Task) => {
-      if (v) {
-        console.log('active task changed to', v);
-        this.taskID = v.id;
-      }
-    });
+    this.backendReady.filter(ok => (ok === true)).take(1).subscribe(
+      (v) => this.stopwatch.loadGroups()
+    );
   }
 
   public ngOnInit() {
-    this.asti.isReady.filter(v => v === true).take(1).subscribe(() => this.getVersions());
+    this.stopwatch.init();
   }
 
   public addGroup() {
     if (this.newGroup.valid) {
-      this.asti.send(message.REQUEST_ADD_GROUP, this.newGroup.value).subscribe(
-        (m: Message) => {
-          const v: Group = Object.assign(new Group, m.data);
-          this.store.dispatch(new GroupsActions.Add(v));
-          this.newGroup.reset();
-        },
-        (e: Error) => {
-          console.log('whoops:', e.message);
-        }
+      this.stopwatch.addGroup(this.newGroup.value).subscribe(
+        () => this.newGroup.reset()
       );
     }
   }
 
   public addTask() {
     if (this.newTask.valid) {
-      const payload = {
-        groupid: this.groupID,
-        name: this.newTask.get('name').value,
-        costcode: this.newTask.get('costcode').value
-      };
-
-      this.asti.send(message.REQUEST_ADD_TASK, payload).subscribe(
-        (m: Message) => {
-          const v: Task = Object.assign(new Task, m.data);
-          this.store.dispatch(new GroupTasksActions.Add(v));
-          this.newTask.reset();
-        },
-        (e: Error) => {
-          console.log('whoops:', e.message);
-        }
+      this.stopwatch.addTask(this.newTask.value).subscribe(
+        () => this.newTask.reset()
       );
     }
   }
 
-  public selectGroup(p: Group) {
-    this.asti.send(message.REQUEST_GET_GROUP_TASKS, {groupid: p.id}).subscribe(
-      (m: Message) => {
-        const tasks: Task[] = [];
-        m.data.forEach(v => {
-          console.log(v);
-          const t: Task = Object.assign(new Task, v);
-          tasks.push(t);
-        });
-
-        this.store.dispatch(new GroupTasksActions.Set(tasks));
-        this.store.dispatch(new SelectedGroupActions.Set(p));
-      },
-      (e: Error) => {
-        console.log('whoops:', e.message);
-      }
-    );
+  public selectGroup(g: Group) {
+    this.stopwatch.selectGroup(g).subscribe((grp: Group) => {
+      console.log('selected', grp);
+    }, (e: Error) => console.log('error', e));
   }
 
   public toggleTask(t: Task) {
-    const payload = {
-      groupid: t.groupid,
-      id: t.id
-    };
-
-    if ((!!t.running) === false) {
-      this.asti.send(message.REQUEST_START_TASK, payload).subscribe(
-        (m: Message) => {
-          const nt: Task = Object.assign(new Task, m.data);
-          this.store.dispatch(new GroupTasksActions.Update(nt));
-          this.store.dispatch(new ActiveTaskActions.Set(nt));
-        },
-        (e: Error) => {
-          console.log('whoops:', e.message);
-        }
-      );
+    if (!!t.running) {
+      this.stopwatch.stopTask(t).subscribe(() => {}, e => console.log(e));
     } else {
-      this.asti.send(message.REQUEST_STOP_TASK, payload).subscribe(
-        (m: Message) => {
-          const nt: Task = Object.assign(new Task, m.data);
-          this.store.dispatch(new GroupTasksActions.Update(nt));
-          this.store.dispatch(new ActiveTaskActions.Clear());
-        },
-        (e: Error) => {
-          console.log('whoops:', e.message);
-        }
-      );
+      this.stopwatch.startTask(t).subscribe(() => {}, e => console.log(e));
     }
-  }
-
-  private getVersions() {
-    this.asti.send(message.REQUEST_APP_VERSIONS, null).subscribe(
-      (m: Message) => {
-        const v: AppVersion = Object.assign(new AppVersion, m.data);
-        this.store.dispatch(new VersionActions.Set(v));
-
-        this.openDatabase();
-      },
-      (e: Error) => {
-        console.log('whoops:', e.message);
-      }
-    );
-  }
-
-  private openDatabase() {
-    this.asti.send(message.REQUEST_OPEN_DATABASE, null).subscribe(
-      () => this.getGroups(),
-      (e: Error) => {
-        console.log('whoops:', e.message);
-      }
-    );
-  }
-
-  private getGroups() {
-    this.asti.send(message.REQUEST_GROUPS, null).subscribe(
-      (m: Message) => {
-        console.log(m.data);
-        const all: Group[] = [];
-        m.data.forEach(v => {
-          all.push(Object.assign(new Group, v));
-        });
-
-        this.store.dispatch(new GroupsActions.Set(all));
-      },
-      (e: Error) => {
-        console.log('whoops:', e.message);
-      }
-    );
   }
 }

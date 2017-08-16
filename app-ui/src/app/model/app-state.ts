@@ -2,6 +2,7 @@ import { AppVersion, Group, Task } from './';
 
 export class AppState {
   constructor(
+    public backendConn: boolean,
     public activeTask?: Task,
     public groupTasks?: Task[],
     public groups?: Group[],

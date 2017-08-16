@@ -29,5 +29,7 @@ func main() {
 	gState.app.Wait()
 
 	// Close database
-	gState.db.Close()
+	if gState.db != nil {
+		gState.db.Close()
+	}
 }

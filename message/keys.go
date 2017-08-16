@@ -18,7 +18,7 @@ const (
 	RequestAddGroup       = Key("add.group")
 	RequestActiveTask     = Key("get.active.task")
 	RequestGroups         = Key("get.groups")
-	RequestGroupTasks     = Key("get.tasks")
+	RequestGroupTasks     = Key("get.group.tasks")
 	RequestStartTask      = Key("start.task")
 	RequestStopTask       = Key("stop.task")
 	RequestTaskSlices     = Key("get.task.slices")

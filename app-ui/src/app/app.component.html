@@ -1,41 +1,14 @@
 <h1>
-  {{title}}
+  {{title}} ready: {{backendReady|async}}
 </h1>
 
 <div *ngIf="activeTask|async">
-  <h3>Now running {{(activeTask|async).name}}</h3>
+  <h3>Now running <span style="color: #0f0">{{(activeTask|async).name}}</span></h3>
 </div>
 
-<div *ngIf="versions|async; then versionTable else loadingVersions"></div>
-<ng-template #versionTable>
-  <h3>Version data</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>App</th>
-        <th>Build</th>
-        <th>Electron</th>
-        <th>Astilectron</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>{{(versions|async)?.app}}</td>
-        <td>{{(versions|async)?.build}}</td>
-        <td>{{(versions|async)?.electron}}</td>
-        <td>{{(versions|async)?.astilectron}}</td>
-      </tr>
-    </tbody>
-  </table>
-</ng-template>
-
-<ng-template #loadingVersions>
-  Loading, just a moment...
-</ng-template>
-
-<div *ngIf="projects|async; then projectsTable else loadingProjects"></div>
-<ng-template #projectsTable>
-  <h3>Projects</h3>
+<div *ngIf="groups|async; then groupsTable else loadingGroups"></div>
+<ng-template #groupsTable>
+  <h3>Groups</h3>
   <table>
     <thead>
       <tr>
@@ -44,24 +17,24 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let p of projects|async">
-        <td>{{p.id}}</td>
-        <td>{{p.name}}</td>
-        <td><button (click)="selectProject(p)">select</button></td>
+      <tr *ngFor="let g of groups|async">
+        <td>{{g.id}}</td>
+        <td>{{g.name}}</td>
+        <td><button (click)="selectGroup(g)">select</button></td>
       </tr>
     </tbody>
   </table>
 
-  <h4>Add project</h4>
-  <form [formGroup]="newProject" (submit)="addProject()" novalidate>
-    <p class="error" *ngIf="newProject.get('name').invalid && newProject.get('name').touched">
+  <h4>Add group</h4>
+  <form [formGroup]="newGroup" (submit)="addGroup()" novalidate>
+    <p class="error" *ngIf="newGroup.get('name').invalid && newGroup.get('name').touched">
       Name must be given
     </p>
     <input type="text" name="name" formControlName="name" />
     <button type="submit">Add</button>
   </form>
 
-  <div *ngIf="selectedProject|async">
+  <div *ngIf="selectedGroup|async">
     <h3>Tasks</h3>
     <table>
       <thead>
@@ -99,6 +72,6 @@
   </div>
 </ng-template>
 
-<ng-template #loadingProjects>
+<ng-template #loadingGroups>
   Loading, just a moment...
 </ng-template>
