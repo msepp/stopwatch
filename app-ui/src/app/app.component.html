@@ -2,11 +2,11 @@
   {{title}}
 </h1>
 
-<div *ngIf="activeTask">
-  <h3>Now running {{activeTask.name}}</h3>
+<div *ngIf="activeTask|async">
+  <h3>Now running {{(activeTask|async).name}}</h3>
 </div>
 
-<div *ngIf="versions; then versionTable else loadingVersions"></div>
+<div *ngIf="versions|async; then versionTable else loadingVersions"></div>
 <ng-template #versionTable>
   <h3>Version data</h3>
   <table>
@@ -20,10 +20,10 @@
     </thead>
     <tbody>
       <tr>
-        <td>{{versions.app}}</td>
-        <td>{{versions.build}}</td>
-        <td>{{versions.electron}}</td>
-        <td>{{versions.astilectron}}</td>
+        <td>{{(versions|async)?.app}}</td>
+        <td>{{(versions|async)?.build}}</td>
+        <td>{{(versions|async)?.electron}}</td>
+        <td>{{(versions|async)?.astilectron}}</td>
       </tr>
     </tbody>
   </table>
@@ -33,7 +33,7 @@
   Loading, just a moment...
 </ng-template>
 
-<div *ngIf="projects; then projectsTable else loadingProjects"></div>
+<div *ngIf="projects|async; then projectsTable else loadingProjects"></div>
 <ng-template #projectsTable>
   <h3>Projects</h3>
   <table>
@@ -44,7 +44,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let p of projects">
+      <tr *ngFor="let p of projects|async">
         <td>{{p.id}}</td>
         <td>{{p.name}}</td>
         <td><button (click)="selectProject(p)">select</button></td>
@@ -61,8 +61,8 @@
     <button type="submit">Add</button>
   </form>
 
-  <h3>Tasks</h3>
-  <div *ngIf="activeProject">
+  <div *ngIf="selectedProject|async">
+    <h3>Tasks</h3>
     <table>
       <thead>
         <tr>
@@ -74,7 +74,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let t of tasks">
+        <tr *ngFor="let t of tasks|async">
           <td>{{t.id}}</td>
           <td>{{t.name}}</td>
           <td>{{t.costcode}}</td>

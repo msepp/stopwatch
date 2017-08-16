@@ -1,5 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Astilectron, Message } from './astilectron';
+import { Store } from '@ngrx/store';
+import { AppState } from './model/app-state';
+import { Observable } from 'rxjs/Observable';
+
+import * as VersionActions from './store/actions/version.actions';
+import * as ProjectsActions from './store/actions/projects.actions';
+import * as ActiveTaskActions from './store/actions/active-task.actions';
+import * as ProjectTasksActions from './store/actions/project-tasks.actions';
+import * as SelectedProjectActions from './store/actions/selected-project.actions';
+
 import * as message from './astilectron/message';
 import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 
@@ -13,18 +23,22 @@ import { Task } from './model/task';
   styleUrls: ['./app.component.less']
 })
 export class AppComponent implements OnInit {
-  public title = 'go-astilectron template project';
-  public projects: Project[] = [];
-  public versions: AppVersion = null;
+  public title = 'Stopwatch';
+  public projects: Observable<Project[]>;
+  public versions: Observable<AppVersion>;
+  public activeTask: Observable<Task>;
+  public selectedProject: Observable<Project>;
+  public tasks: Observable<Task[]>;
   public newProject: FormGroup;
   public newTask: FormGroup;
-  public activeTask: Task;
-  public activeProject: Project;
-  public tasks: Task[];
+
+  public projectID: number;
+  public taskID: number;
 
   constructor(
     private asti: Astilectron,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private store: Store<AppState>
   ) {
     this.newProject = this.fb.group({
       name: ['', Validators.required]
@@ -33,6 +47,25 @@ export class AppComponent implements OnInit {
     this.newTask = this.fb.group({
       name: ['', Validators.required],
       costcode: ''
+    });
+
+    this.versions = this.store.select('version');
+    this.projects = this.store.select('projects');
+    this.tasks = this.store.select('projectTasks');
+    this.activeTask = this.store.select('activeTask');
+    this.selectedProject = this.store.select('selectedProject');
+
+    this.selectedProject.subscribe((v: Project) => {
+      if (v) {
+        this.projectID = v.id;
+      }
+    });
+
+    this.activeTask.subscribe((v: Task) => {
+      if (v) {
+        console.log('active task changed to', v);
+        this.taskID = v.id;
+      }
     });
   }
 
@@ -45,7 +78,7 @@ export class AppComponent implements OnInit {
       this.asti.send(message.REQUEST_ADD_PROJECT, this.newProject.value).subscribe(
         (m: Message) => {
           const v: Project = Object.assign(new Project, m.data);
-          this.projects.push(v);
+          this.store.dispatch(new ProjectsActions.Add(v));
           this.newProject.reset();
         },
         (e: Error) => {
@@ -58,7 +91,7 @@ export class AppComponent implements OnInit {
   public addTask() {
     if (this.newTask.valid) {
       const payload = {
-        projectid: this.activeProject.id,
+        projectid: this.projectID,
         name: this.newTask.get('name').value,
         costcode: this.newTask.get('costcode').value
       };
@@ -66,7 +99,7 @@ export class AppComponent implements OnInit {
       this.asti.send(message.REQUEST_ADD_TASK, payload).subscribe(
         (m: Message) => {
           const v: Task = Object.assign(new Task, m.data);
-          this.tasks.push(v);
+          this.store.dispatch(new ProjectTasksActions.Add(v));
           this.newTask.reset();
         },
         (e: Error) => {
@@ -85,8 +118,9 @@ export class AppComponent implements OnInit {
           const t: Task = Object.assign(new Task, v);
           tasks.push(t);
         });
-        this.tasks = tasks;
-        this.activeProject = p;
+
+        this.store.dispatch(new ProjectTasksActions.Set(tasks));
+        this.store.dispatch(new SelectedProjectActions.Set(p));
       },
       (e: Error) => {
         console.log('whoops:', e.message);
@@ -104,8 +138,8 @@ export class AppComponent implements OnInit {
       this.asti.send(message.REQUEST_START_TASK, payload).subscribe(
         (m: Message) => {
           const nt: Task = Object.assign(new Task, m.data);
-          t.running = nt.running;
-          this.activeTask = t;
+          this.store.dispatch(new ProjectTasksActions.Update(nt));
+          this.store.dispatch(new ActiveTaskActions.Set(nt));
         },
         (e: Error) => {
           console.log('whoops:', e.message);
@@ -115,11 +149,8 @@ export class AppComponent implements OnInit {
       this.asti.send(message.REQUEST_STOP_TASK, payload).subscribe(
         (m: Message) => {
           const nt: Task = Object.assign(new Task, m.data);
-          t.running = nt.running;
-          t.duration = nt.duration;
-          if (this.activeTask && this.activeTask.id === t.id && this.activeTask.projectid === t.projectid) {
-            this.activeTask = null;
-          }
+          this.store.dispatch(new ProjectTasksActions.Update(nt));
+          this.store.dispatch(new ActiveTaskActions.Stop(nt));
         },
         (e: Error) => {
           console.log('whoops:', e.message);
@@ -132,7 +163,7 @@ export class AppComponent implements OnInit {
     this.asti.send(message.REQUEST_APP_VERSIONS, null).subscribe(
       (m: Message) => {
         const v: AppVersion = Object.assign(new AppVersion, m.data);
-        this.versions = v;
+        this.store.dispatch(new VersionActions.Set(v));
 
         this.openDatabase();
       },
@@ -154,14 +185,19 @@ export class AppComponent implements OnInit {
   private getProjects() {
     this.asti.send(message.REQUEST_PROJECTS, null).subscribe(
       (m: Message) => {
+        console.log(m.data);
+        const all: Project[] = [];
         m.data.projects.forEach(v => {
-          this.projects.push(Object.assign(new Project, v));
+          all.push(Object.assign(new Project, v));
         });
+
+        this.store.dispatch(new ProjectsActions.Set(all));
 
         if (m.data.activeTask) {
           const t: Task = Object.assign(new Task, m.data.activeTask);
           if (t.id !== 0) {
-            this.activeTask = t;
+            console.log('initial active task:', t);
+            this.store.dispatch(new ActiveTaskActions.Set(t));
           }
         } else {
           this.activeTask = null;
