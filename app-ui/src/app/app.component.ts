@@ -21,80 +21,24 @@ import { StopwatchService } from './services/stopwatch.service';
   styleUrls: ['./app.component.less']
 })
 export class AppComponent implements OnInit {
-  public title = 'Stopwatch';
-  public groups: Observable<Group[]>;
-  public versions: Observable<AppVersion>;
-  public activeTask: Observable<Task>;
-  public selectedGroup: Observable<Group>;
-  public tasks: Observable<Task[]>;
-  public newGroup: FormGroup;
-  public newTask: FormGroup;
-  public backendReady: Observable<boolean>;
+  public ready = false;
 
   constructor(
     private stopwatch: StopwatchService,
-    private fb: FormBuilder,
     private store: Store<AppState>
   ) {
-    this.newGroup = this.fb.group({
-      name: ['', Validators.required]
-    });
-
-    this.newTask = this.fb.group({
-      groupid: 0,
-      name: ['', Validators.required],
-      costcode: ''
-    });
-
-    this.backendReady = this.store.select('backendConn');
-    this.versions = this.store.select('version');
-    this.groups = this.store.select('groups');
-    this.tasks = this.store.select('groupTasks');
-    this.activeTask = this.store.select('activeTask');
-    this.selectedGroup = this.store.select('selectedGroup');
-
-    this.selectedGroup.subscribe((v: Group) => {
-      if (v) {
-        this.newTask.get('groupid').setValue(v.id);
-      }
-    });
-
-    this.backendReady.filter(ok => (ok === true)).take(1).subscribe(
-      (v) => this.stopwatch.loadGroups()
-    );
+    this.store.select('backendConn')
+      .filter(ok => (ok === true))
+      .take(1)
+      .concatMap(() => this.stopwatch.loadGroups())
+      .concatMap(() => this.stopwatch.loadActiveTask())
+      .subscribe(
+        () => { console.log('ready'); this.ready = true; },
+        e => console.log('error:', e)
+      );
   }
 
   public ngOnInit() {
     this.stopwatch.init();
-  }
-
-  public addGroup() {
-    if (this.newGroup.valid) {
-      this.stopwatch.addGroup(this.newGroup.value).subscribe(
-        () => this.newGroup.reset()
-      );
-    }
-  }
-
-  public addTask() {
-    if (this.newTask.valid) {
-      this.stopwatch.addTask(this.newTask.value).subscribe(
-        () => this.newTask.reset()
-      );
-    }
-  }
-
-  public selectGroup(g: Group) {
-    this.stopwatch.selectGroup(g).subscribe((grp: Group) => {
-      console.log('selected', grp);
-    }, (e: Error) => console.log('error', e));
-  }
-
-  public toggleTask(t: Task) {
-    if (!!t.running) {
-      this.stopwatch.stopTask(t).subscribe(() => {}, e => console.log(e));
-    } else {
-      this.stopwatch.startTask(t).subscribe(() => {}, e => console.log(e));
-    }
   }
 }

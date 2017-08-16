@@ -1,0 +1,18 @@
+<div *ngIf="active; then showActive else showInactive"></div>
+
+<ng-template #showInactive>
+  <md-card>
+    <md-card-title>Active task</md-card-title>
+    <md-card-subtitle>no task active</md-card-subtitle>
+  </md-card>
+</ng-template>
+
+<ng-template #showActive>
+  <md-card>
+    <md-card-title>Active task</md-card-title>
+    <md-card-subtitle>{{active.name}}</md-card-subtitle>
+    <md-card-content>
+      Running since {{active.running|date:'medium'}}
+    </md-card-content>
+  </md-card>
+</ng-template>

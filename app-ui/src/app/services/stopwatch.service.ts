@@ -66,9 +66,15 @@ export class StopwatchService {
 
     this.backend.send(messaging.REQUEST_ACTIVE_TASK, null).subscribe(
       (m: messaging.Message) => {
-        const task: Task = Object.assign(new Task, m.data);
+        console.log('loaded active task:', m.data);
+        let task: Task = null;
+
+        if (m.data !== null) {
+          task = Object.assign(new Task, m.data);
+        }
+
         this.store.dispatch(new ActiveTaskActions.Set(task));
-        s.next(s);
+        s.next(task);
       },
       (e: Error) => s.error(e),
       () => s.complete()

@@ -1,77 +1,9 @@
-<h1>
-  {{title}} ready: {{backendReady|async}}
-</h1>
 
-<div *ngIf="activeTask|async">
-  <h3>Now running <span style="color: #0f0">{{(activeTask|async).name}}</span></h3>
-</div>
-
-<div *ngIf="groups|async; then groupsTable else loadingGroups"></div>
-<ng-template #groupsTable>
-  <h3>Groups</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let g of groups|async">
-        <td>{{g.id}}</td>
-        <td>{{g.name}}</td>
-        <td><button (click)="selectGroup(g)">select</button></td>
-      </tr>
-    </tbody>
-  </table>
-
-  <h4>Add group</h4>
-  <form [formGroup]="newGroup" (submit)="addGroup()" novalidate>
-    <p class="error" *ngIf="newGroup.get('name').invalid && newGroup.get('name').touched">
-      Name must be given
-    </p>
-    <input type="text" name="name" formControlName="name" />
-    <button type="submit">Add</button>
-  </form>
-
-  <div *ngIf="selectedGroup|async">
-    <h3>Tasks</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Cost code</th>
-          <th>Time used</th>
-          <th>Running since</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let t of tasks|async">
-          <td>{{t.id}}</td>
-          <td>{{t.name}}</td>
-          <td>{{t.costcode}}</td>
-          <td>{{t.duration}}</td>
-          <td>{{t.running}}</td>
-          <td><button (click)="toggleTask(t)">toggle</button></td>
-        </tr>
-      </tbody>
-    </table>
-    <form [formGroup]="newTask" (submit)="addTask()" novalidate>
-      <p class="error" *ngIf="newTask.get('name').invalid && newTask.get('name').touched">
-        Name must be given
-      </p>
-      <div>
-        <input type="text" name="name" formControlName="name" />
-      </div>
-      <div>
-        <input type="text" name="costcode" formControlName="costcode" />
-      </div>
-      <button type="submit">Add</button>
-    </form>
-  </div>
+<div *ngIf="ready; then render else wait"></div>
+<ng-template #render>
+  <app-active-task></app-active-task>
+  <router-outlet></router-outlet>
 </ng-template>
-
-<ng-template #loadingGroups>
-  Loading, just a moment...
+<ng-template #wait>
+  <md-spinner></md-spinner>
 </ng-template>
