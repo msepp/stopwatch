@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -170,7 +171,7 @@ func (db *StopwatchDB) StartTask(project, task int) (*Task, error) {
 			return nil
 		}
 
-		now = time.Now()
+		now = time.Now().UTC()
 		return b.Put([]byte(now.Format(time.RFC3339)), []byte{})
 	})
 
@@ -215,7 +216,7 @@ func (db *StopwatchDB) StopTask(project, task int) (*Task, error) {
 		}
 
 		start, _ := time.Parse(time.RFC3339, string(k))
-		now := time.Now()
+		now := time.Now().UTC()
 		d = now.Sub(start)
 
 		return b.Put(k, []byte(now.Format(time.RFC3339)))
@@ -275,6 +276,7 @@ func (db *StopwatchDB) GetActiveTask() (*Task, error) {
 		return nil, err
 	}
 
+	log.Printf("getactive: %+v", at)
 	if at.ProjectID == 0 && at.TaskID == 0 {
 		return nil, nil
 	}
@@ -297,6 +299,7 @@ func (db *StopwatchDB) SetActiveTask(project, task int) error {
 			return err
 		}
 
+		log.Printf("setactive: %+v", at)
 		return b.Put([]byte("activeTask"), buf)
 	})
 }

@@ -236,11 +236,11 @@ func HandleStartTask(msg *message.Message) (interface{}, error) {
 			if _, err = gState.db.StopTask(activeTask.ProjectID, activeTask.ID); err != nil {
 				return nil, fmt.Errorf("unable to stop current task: %s", err)
 			}
-
-			if err = gState.db.SetActiveTask(task.ProjectID, task.ID); err != nil {
-				return nil, fmt.Errorf("unable to set active task: %s", err)
-			}
 		}
+	}
+
+	if err = gState.db.SetActiveTask(task.ProjectID, task.ID); err != nil {
+		return nil, fmt.Errorf("unable to set active task: %s", err)
 	}
 
 	// Mark running
