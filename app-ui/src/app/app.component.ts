@@ -5,17 +5,15 @@ import { AppState } from './model/app-state';
 import { Observable } from 'rxjs/Observable';
 
 import * as VersionActions from './store/actions/version.actions';
-import * as ProjectsActions from './store/actions/projects.actions';
+import * as GroupsActions from './store/actions/groups.actions';
 import * as ActiveTaskActions from './store/actions/active-task.actions';
-import * as ProjectTasksActions from './store/actions/project-tasks.actions';
-import * as SelectedProjectActions from './store/actions/selected-project.actions';
+import * as GroupTasksActions from './store/actions/group-tasks.actions';
+import * as SelectedGroupActions from './store/actions/selected-group.actions';
 
 import * as message from './astilectron/message';
 import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 
-import { AppVersion } from './model/app-version';
-import { Project } from './model/project';
-import { Task } from './model/task';
+import { AppVersion, Group, Task } from './model';
 
 @Component({
   selector: 'app-root',
@@ -24,15 +22,15 @@ import { Task } from './model/task';
 })
 export class AppComponent implements OnInit {
   public title = 'Stopwatch';
-  public projects: Observable<Project[]>;
+  public groups: Observable<Group[]>;
   public versions: Observable<AppVersion>;
   public activeTask: Observable<Task>;
-  public selectedProject: Observable<Project>;
+  public selectedGroup: Observable<Group>;
   public tasks: Observable<Task[]>;
-  public newProject: FormGroup;
+  public newGroup: FormGroup;
   public newTask: FormGroup;
 
-  public projectID: number;
+  public groupID: number;
   public taskID: number;
 
   constructor(
@@ -40,7 +38,7 @@ export class AppComponent implements OnInit {
     private fb: FormBuilder,
     private store: Store<AppState>
   ) {
-    this.newProject = this.fb.group({
+    this.newGroup = this.fb.group({
       name: ['', Validators.required]
     });
 
@@ -50,14 +48,14 @@ export class AppComponent implements OnInit {
     });
 
     this.versions = this.store.select('version');
-    this.projects = this.store.select('projects');
-    this.tasks = this.store.select('projectTasks');
+    this.groups = this.store.select('groups');
+    this.tasks = this.store.select('groupTasks');
     this.activeTask = this.store.select('activeTask');
-    this.selectedProject = this.store.select('selectedProject');
+    this.selectedGroup = this.store.select('selectedGroup');
 
-    this.selectedProject.subscribe((v: Project) => {
+    this.selectedGroup.subscribe((v: Group) => {
       if (v) {
-        this.projectID = v.id;
+        this.groupID = v.id;
       }
     });
 
@@ -73,13 +71,13 @@ export class AppComponent implements OnInit {
     this.asti.isReady.filter(v => v === true).take(1).subscribe(() => this.getVersions());
   }
 
-  public addProject() {
-    if (this.newProject.valid) {
-      this.asti.send(message.REQUEST_ADD_PROJECT, this.newProject.value).subscribe(
+  public addGroup() {
+    if (this.newGroup.valid) {
+      this.asti.send(message.REQUEST_ADD_GROUP, this.newGroup.value).subscribe(
         (m: Message) => {
-          const v: Project = Object.assign(new Project, m.data);
-          this.store.dispatch(new ProjectsActions.Add(v));
-          this.newProject.reset();
+          const v: Group = Object.assign(new Group, m.data);
+          this.store.dispatch(new GroupsActions.Add(v));
+          this.newGroup.reset();
         },
         (e: Error) => {
           console.log('whoops:', e.message);
@@ -91,7 +89,7 @@ export class AppComponent implements OnInit {
   public addTask() {
     if (this.newTask.valid) {
       const payload = {
-        projectid: this.projectID,
+        groupid: this.groupID,
         name: this.newTask.get('name').value,
         costcode: this.newTask.get('costcode').value
       };
@@ -99,7 +97,7 @@ export class AppComponent implements OnInit {
       this.asti.send(message.REQUEST_ADD_TASK, payload).subscribe(
         (m: Message) => {
           const v: Task = Object.assign(new Task, m.data);
-          this.store.dispatch(new ProjectTasksActions.Add(v));
+          this.store.dispatch(new GroupTasksActions.Add(v));
           this.newTask.reset();
         },
         (e: Error) => {
@@ -109,8 +107,8 @@ export class AppComponent implements OnInit {
     }
   }
 
-  public selectProject(p: Project) {
-    this.asti.send(message.REQUEST_GET_PROJECT_TASKS, {projectid: p.id}).subscribe(
+  public selectGroup(p: Group) {
+    this.asti.send(message.REQUEST_GET_GROUP_TASKS, {groupid: p.id}).subscribe(
       (m: Message) => {
         const tasks: Task[] = [];
         m.data.forEach(v => {
@@ -119,8 +117,8 @@ export class AppComponent implements OnInit {
           tasks.push(t);
         });
 
-        this.store.dispatch(new ProjectTasksActions.Set(tasks));
-        this.store.dispatch(new SelectedProjectActions.Set(p));
+        this.store.dispatch(new GroupTasksActions.Set(tasks));
+        this.store.dispatch(new SelectedGroupActions.Set(p));
       },
       (e: Error) => {
         console.log('whoops:', e.message);
@@ -130,7 +128,7 @@ export class AppComponent implements OnInit {
 
   public toggleTask(t: Task) {
     const payload = {
-      projectid: t.projectid,
+      groupid: t.groupid,
       id: t.id
     };
 
@@ -138,7 +136,7 @@ export class AppComponent implements OnInit {
       this.asti.send(message.REQUEST_START_TASK, payload).subscribe(
         (m: Message) => {
           const nt: Task = Object.assign(new Task, m.data);
-          this.store.dispatch(new ProjectTasksActions.Update(nt));
+          this.store.dispatch(new GroupTasksActions.Update(nt));
           this.store.dispatch(new ActiveTaskActions.Set(nt));
         },
         (e: Error) => {
@@ -149,8 +147,8 @@ export class AppComponent implements OnInit {
       this.asti.send(message.REQUEST_STOP_TASK, payload).subscribe(
         (m: Message) => {
           const nt: Task = Object.assign(new Task, m.data);
-          this.store.dispatch(new ProjectTasksActions.Update(nt));
-          this.store.dispatch(new ActiveTaskActions.Stop(nt));
+          this.store.dispatch(new GroupTasksActions.Update(nt));
+          this.store.dispatch(new ActiveTaskActions.Clear());
         },
         (e: Error) => {
           console.log('whoops:', e.message);
@@ -175,33 +173,23 @@ export class AppComponent implements OnInit {
 
   private openDatabase() {
     this.asti.send(message.REQUEST_OPEN_DATABASE, null).subscribe(
-      () => this.getProjects(),
+      () => this.getGroups(),
       (e: Error) => {
         console.log('whoops:', e.message);
       }
     );
   }
 
-  private getProjects() {
-    this.asti.send(message.REQUEST_PROJECTS, null).subscribe(
+  private getGroups() {
+    this.asti.send(message.REQUEST_GROUPS, null).subscribe(
       (m: Message) => {
         console.log(m.data);
-        const all: Project[] = [];
-        m.data.projects.forEach(v => {
-          all.push(Object.assign(new Project, v));
+        const all: Group[] = [];
+        m.data.forEach(v => {
+          all.push(Object.assign(new Group, v));
         });
 
-        this.store.dispatch(new ProjectsActions.Set(all));
-
-        if (m.data.activeTask) {
-          const t: Task = Object.assign(new Task, m.data.activeTask);
-          if (t.id !== 0) {
-            console.log('initial active task:', t);
-            this.store.dispatch(new ActiveTaskActions.Set(t));
-          }
-        } else {
-          this.activeTask = null;
-        }
+        this.store.dispatch(new GroupsActions.Set(all));
       },
       (e: Error) => {
         console.log('whoops:', e.message);

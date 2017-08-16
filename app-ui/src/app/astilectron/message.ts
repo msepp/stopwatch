@@ -3,13 +3,14 @@
 export const REQUEST_WINDOW_CLOSE    = 'window.close';
 export const REQUEST_WINDOW_MINIMIZE = 'window.minimize';
 export const REQUEST_APP_VERSIONS    = 'get.versions';
-export const REQUEST_PROJECTS        = 'get.projects';
-export const REQUEST_ADD_PROJECT     = 'add.project';
+export const REQUEST_GROUPS          = 'get.groups';
+export const REQUEST_ADD_GROUP       = 'add.group';
 export const REQUEST_ADD_TASK        = 'add.task';
 export const REQUEST_START_TASK      = 'start.task';
 export const REQUEST_STOP_TASK       = 'stop.task';
 export const REQUEST_OPEN_DATABASE   = 'open.database';
-export const REQUEST_GET_PROJECT_TASKS = 'get.project.tasks';
+export const REQUEST_GET_GROUP_TASKS = 'get.group.tasks';
+export const REQUEST_GET_ACTIVE_TASK = 'get.active.task';
 
 // Event keys
 export const EVENT_BACKEND_STATUS = 'backend.status';

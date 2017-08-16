@@ -8,20 +8,21 @@ import { EffectsModule } from '@ngrx/effects';
 
 import { AppComponent } from './app.component';
 import { AstilectronModule } from './astilectron';
+import { StopwatchService } from './services/stopwatch.service';
 
 // Store reducers
 import { ActiveTaskReducer } from './store/reducers/active-task.reducers';
-import { ProjectTasksReducer } from './store/reducers/project-tasks.reducers';
-import { ProjectsReducer } from './store/reducers/projects.reducers';
-import { SelectedProjectReducer } from './store/reducers/selected-project.reducers';
+import { GroupTasksReducer } from './store/reducers/group-tasks.reducers';
+import { GroupsReducer } from './store/reducers/groups.reducers';
+import { SelectedGroupReducer } from './store/reducers/selected-group.reducers';
 import { SelectedTaskReducer } from './store/reducers/selected-task.reducers';
 import { VersionReducer } from './store/reducers/version.reducers';
 
 // Store effects
 import { ActiveTaskEffects } from './store/effects/active-task.effects';
-import { ProjectTasksEffects } from './store/effects/project-tasks.effects';
-import { ProjectsEffects } from './store/effects/projects.effects';
-import { SelectedProjectEffects } from './store/effects/selected-project.effects';
+import { GroupTasksEffects } from './store/effects/group-tasks.effects';
+import { GroupsEffects } from './store/effects/groups.effects';
+import { SelectedGroupEffects } from './store/effects/selected-group.effects';
 import { SelectedTaskEffects } from './store/effects/selected-task.effects';
 @NgModule({
   declarations: [
@@ -33,23 +34,25 @@ import { SelectedTaskEffects } from './store/effects/selected-task.effects';
     HttpModule,
     BrowserAnimationsModule,
     StoreModule.forRoot({
-      selectedProject: SelectedProjectReducer,
+      selectedGroup: SelectedGroupReducer,
       selectedTask: SelectedTaskReducer,
       activeTask: ActiveTaskReducer,
-      projects: ProjectsReducer,
-      projectTasks: ProjectTasksReducer,
+      groups: GroupsReducer,
+      groupTasks: GroupTasksReducer,
       version: VersionReducer
     }),
     EffectsModule.forRoot([
       ActiveTaskEffects,
-      ProjectTasksEffects,
-      ProjectsEffects,
-      SelectedProjectEffects,
+      GroupTasksEffects,
+      GroupsEffects,
+      SelectedGroupEffects,
       SelectedTaskEffects
     ]),
     AstilectronModule
   ],
-  providers: [],
+  providers: [
+    StopwatchService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

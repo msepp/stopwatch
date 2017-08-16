@@ -3,10 +3,10 @@ import { Store, Action } from '@ngrx/store';
 import { Actions, Effect } from '@ngrx/effects';
 import { AppState } from '../../model/app-state';
 
-import * as SelectedProjectActions from '../actions/selected-project.actions';
+import * as SelectedGroupActions from '../actions/selected-group.actions';
 
 @Injectable()
-export class SelectedProjectEffects {
+export class SelectedGroupEffects {
   constructor() {}
 
 }

@@ -9,11 +9,11 @@ export class Set implements Action {
   constructor(public payload: Task) {}
 }
 
-export const STOP_ACTIVE_TASK = '[active task] STOP';
-export class Stop implements Action {
-  readonly type = STOP_ACTIVE_TASK;
-  constructor(public payload: Task) {}
+export const CLEAR_ACTIVE_TASK = '[active task] CLEAR';
+export class Clear implements Action {
+  readonly type = CLEAR_ACTIVE_TASK;
+  constructor() {}
 }
 
 
-export type All = Stop | Set;
+export type All = Clear | Set;

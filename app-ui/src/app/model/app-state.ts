@@ -1,13 +1,11 @@
-import { Project } from './project';
-import { Task } from './task';
-import { AppVersion } from './app-version';
+import { AppVersion, Group, Task } from './';
 
 export class AppState {
   constructor(
     public activeTask?: Task,
-    public projectTasks?: Task[],
-    public projects?: Project[],
-    public selectedProject?: Project,
+    public groupTasks?: Task[],
+    public groups?: Group[],
+    public selectedGroup?: Group,
     public selectedTask?: Task,
     public version?: AppVersion
   ) {}

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"path"
 
@@ -18,8 +17,11 @@ func HandleGUIMessage(msg *message.Message) (interface{}, error) {
 	case message.RequestOpenDatabase:
 		return HandleOpenDatabase(msg)
 
-	case message.RequestConfig:
-		return HandleGetConfig(msg)
+	case message.RequestGroups:
+		return HandleGetGroups(msg)
+
+	case message.RequestActiveTask:
+		return HandleGetActiveTask(msg)
 
 	case message.RequestGroupTasks:
 		return HandleGetGroupTasks(msg)
@@ -54,11 +56,6 @@ func HandleGetAppVersions(msg *message.Message) (interface{}, error) {
 // HandleOpenDatabase attempts to open database. Returns if the operation
 // succeeded.
 func HandleOpenDatabase(msg *message.Message) (interface{}, error) {
-	if gState.app.SetOpRunning(true) == false {
-		return nil, errors.New("backend busy")
-	}
-	defer gState.app.SetOpRunning(false)
-
 	if gState.db == nil {
 		gState.db = NewStopwatchDB()
 	}
@@ -76,13 +73,8 @@ func HandleOpenDatabase(msg *message.Message) (interface{}, error) {
 	return nil, nil
 }
 
-// HandleGetConfig returns app config and last known state
-func HandleGetConfig(msg *message.Message) (interface{}, error) {
-	if gState.app.SetOpRunning(true) == false {
-		return nil, errors.New("backend busy")
-	}
-	defer gState.app.SetOpRunning(false)
-
+// HandleGetGroups returns all known groups
+func HandleGetGroups(msg *message.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -93,25 +85,26 @@ func HandleGetConfig(msg *message.Message) (interface{}, error) {
 		return nil, fmt.Errorf("Unable to read groups: %s", err)
 	}
 
+	return groups, nil
+}
+
+// HandleGetActiveTask returns current active task or nil if not set.
+func HandleGetActiveTask(msg *message.Message) (interface{}, error) {
+	if gState.db == nil {
+		return nil, fmt.Errorf("no database")
+	}
+
 	// Get active task
 	at, err := gState.db.GetActiveTask()
 	if err != nil {
 		return nil, fmt.Errorf("Unable to read active task: %s", err)
 	}
 
-	return &Config{
-		Groups:     groups,
-		ActiveTask: at,
-	}, nil
+	return at, nil
 }
 
 // HandleGetGroupTasks returns list of tasks for a group
 func HandleGetGroupTasks(msg *message.Message) (interface{}, error) {
-	if gState.app.SetOpRunning(true) == false {
-		return nil, errors.New("backend busy")
-	}
-	defer gState.app.SetOpRunning(false)
-
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -132,11 +125,6 @@ func HandleGetGroupTasks(msg *message.Message) (interface{}, error) {
 
 // HandleAddGroup adds the group detailed in msg data
 func HandleAddGroup(msg *message.Message) (interface{}, error) {
-	if gState.app.SetOpRunning(true) == false {
-		return nil, errors.New("backend busy")
-	}
-	defer gState.app.SetOpRunning(false)
-
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -156,11 +144,6 @@ func HandleAddGroup(msg *message.Message) (interface{}, error) {
 
 // HandleAddTask adds a task for a group using details from msg data
 func HandleAddTask(msg *message.Message) (interface{}, error) {
-	if gState.app.SetOpRunning(true) == false {
-		return nil, errors.New("backend busy")
-	}
-	defer gState.app.SetOpRunning(false)
-
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -187,11 +170,6 @@ func HandleAddTask(msg *message.Message) (interface{}, error) {
 
 // HandleStartTask starts a task
 func HandleStartTask(msg *message.Message) (interface{}, error) {
-	if gState.app.SetOpRunning(true) == false {
-		return nil, errors.New("backend busy")
-	}
-	defer gState.app.SetOpRunning(false)
-
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -239,11 +217,6 @@ func HandleStartTask(msg *message.Message) (interface{}, error) {
 
 // HandleStopTask stops a task
 func HandleStopTask(msg *message.Message) (interface{}, error) {
-	if gState.app.SetOpRunning(true) == false {
-		return nil, errors.New("backend busy")
-	}
-	defer gState.app.SetOpRunning(false)
-
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
