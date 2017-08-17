@@ -14,10 +14,16 @@ export class Add implements Action {
   constructor(public payload: Group) {}
 }
 
+export const UPDATE_GROUP = '[groups] UPDATE';
+export class Update implements Action {
+  readonly type = UPDATE_GROUP;
+  constructor(public payload: Group) {}
+}
+
 export const LOAD_GROUPS = '[groups] LOAD';
 export class Load implements Action {
   readonly type = LOAD_GROUPS;
   constructor(public payload?: any) {}
 }
 
-export type All = Set | Add | Load;
+export type All = Set | Add | Load | Update;

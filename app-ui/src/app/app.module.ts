@@ -29,6 +29,7 @@ import { GroupsHomeComponent } from './groups-home/groups-home.component';
 import { GroupDetailsComponent } from './group-details/group-details.component';
 import { TaskDurationPipe } from './task-duration.pipe';
 import { AddTaskFormComponent } from './add-task-form/add-task-form.component';
+import { TaskDetailsComponent } from './task-details/task-details.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { AddTaskFormComponent } from './add-task-form/add-task-form.component';
     GroupsHomeComponent,
     GroupDetailsComponent,
     TaskDurationPipe,
-    AddTaskFormComponent
+    AddTaskFormComponent,
+    TaskDetailsComponent
   ],
   imports: [
     BrowserModule,
@@ -50,6 +52,7 @@ import { AddTaskFormComponent } from './add-task-form/add-task-form.component';
     RouterModule.forRoot([
       {path: 'groups', component: GroupsHomeComponent},
       {path: 'group/:id', component: GroupDetailsComponent},
+      {path: 'task/:id', component: TaskDetailsComponent},
       {path: '**', redirectTo: 'groups'}
     ]),
     StoreModule.forRoot({

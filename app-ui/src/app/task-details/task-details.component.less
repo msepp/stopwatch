@@ -11,30 +11,21 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
-.nameform {
+.detailsform {
   padding: 0 1rem;
 
   form {
     display: flex;
+    justify-content: space-between;
 
-    md-input-container {
+    .mat-input-container {
       flex: 1 0 auto;
+      &:first-child {
+        margin-right: 0.25rem;
+      }
+      &:last-child {
+        margin-left: 0.25rem;
+      }
     }
   }
-}
-
-.listing {
-  padding: 0;
-  flex: 1 0 auto;
-}
-
-.not-found-message, .list-title {
-  padding: 0 1rem;
-}
-
-.form {
-  margin-top: 1rem;
-  padding: 1rem;
-  background-color: #fcfcfc;
-  border-top: 1px solid #eee;
 }

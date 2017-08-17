@@ -1,8 +1,7 @@
 import * as SelectedGroupActions from '../actions/selected-group.actions';
+import {Group} from '../../model/group';
 
 export type Action = SelectedGroupActions.All;
-
-import {Group} from '../../model/group';
 
 export function SelectedGroupReducer(state: Group = null, action: Action): Group {
   switch (action.type) {

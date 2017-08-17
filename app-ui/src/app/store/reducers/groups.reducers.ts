@@ -15,6 +15,16 @@ export function GroupsReducer(state: Group[] = [], action: Action): Group[] {
       return state;
     }
 
+    case GroupsActions.UPDATE_GROUP: {
+      const idx = state.findIndex(v => v.id === action.payload.id);
+      if (idx === -1) {
+        return state;
+      }
+
+      state[idx] = action.payload;
+      return state;
+    }
+
     default:
       return state;
   };

@@ -133,6 +133,26 @@ func (db *StopwatchDB) GetTask(group, task int) (*Task, error) {
 	return &t, err
 }
 
+// GetGroup returns one group details
+func (db *StopwatchDB) GetGroup(group int) (*Group, error) {
+	if db.IsOpen() == false {
+		return nil, errors.New("database not ready")
+	}
+
+	var g Group
+	err := db.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucketGroups))
+		v := b.Get(itob(group))
+		if v == nil {
+			return errors.New("group not found")
+		}
+
+		return json.Unmarshal(v, &g)
+	})
+
+	return &g, err
+}
+
 // StartTask marks tasks start
 func (db *StopwatchDB) StartTask(group, task int) (*Task, error) {
 	if db.IsOpen() == false {
@@ -239,6 +259,19 @@ func (db *StopwatchDB) SaveTask(task *Task) error {
 
 		buf, _ := json.Marshal(task)
 		return b.Put(itob(task.ID), buf)
+	})
+}
+
+// SaveGroup updates group value in database to the given value
+func (db *StopwatchDB) SaveGroup(group *Group) error {
+	if db.IsOpen() == false {
+		return errors.New("database not ready")
+	}
+
+	return db.db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucketGroups))
+		buf, _ := json.Marshal(group)
+		return b.Put(itob(group.ID), buf)
 	})
 }
 

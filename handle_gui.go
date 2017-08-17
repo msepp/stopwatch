@@ -29,8 +29,14 @@ func HandleGUIMessage(msg *message.Message) (interface{}, error) {
 	case message.RequestAddGroup:
 		return HandleAddGroup(msg)
 
+	case message.RequestUpdateGroup:
+		return HandleUpdateGroup(msg)
+
 	case message.RequestAddTask:
 		return HandleAddTask(msg)
+
+	case message.RequestUpdateTask:
+		return HandleUpdateTask(msg)
 
 	case message.RequestStartTask:
 		return HandleStartTask(msg)
@@ -140,6 +146,65 @@ func HandleAddGroup(msg *message.Message) (interface{}, error) {
 	}
 
 	return p, nil
+}
+
+// HandleUpdateGroup updates group value in database
+func HandleUpdateGroup(msg *message.Message) (interface{}, error) {
+	if gState.db == nil {
+		return nil, fmt.Errorf("no database")
+	}
+
+	var payload ReqPayloadUpdateGroup
+	if err := msg.Into(&payload); err != nil {
+		return nil, fmt.Errorf("payload invalid: %s", err)
+	}
+
+	if payload.GroupID <= 0 {
+		return nil, fmt.Errorf("group id must be non-zero positive integer")
+	}
+
+	// Locate task
+	grp, err := gState.db.GetGroup(payload.GroupID)
+	if err != nil {
+		return nil, fmt.Errorf("group not found: %s", err)
+	}
+
+	// Save with new name
+	grp.Name = payload.Name
+
+	return grp, gState.db.SaveGroup(grp)
+}
+
+// HandleUpdateTask updates task value in database
+func HandleUpdateTask(msg *message.Message) (interface{}, error) {
+	if gState.db == nil {
+		return nil, fmt.Errorf("no database")
+	}
+
+	var payload ReqPayloadUpdateTask
+	if err := msg.Into(&payload); err != nil {
+		return nil, fmt.Errorf("payload invalid: %s", err)
+	}
+
+	if payload.GroupID <= 0 || payload.TaskID <= 0 {
+		return nil, fmt.Errorf("group id and task id must be non-zero positive integers")
+	}
+
+	if payload.Name == "" {
+		return nil, fmt.Errorf("name can't be empty")
+	}
+
+	// Locate task
+	task, err := gState.db.GetTask(payload.GroupID, payload.TaskID)
+	if err != nil {
+		return nil, fmt.Errorf("task not found", err)
+	}
+
+	// Save with new name
+	task.Name = payload.Name
+	task.CostCode = payload.CostCode
+
+	return task, gState.db.SaveTask(task)
 }
 
 // HandleAddTask adds a task for a group using details from msg data

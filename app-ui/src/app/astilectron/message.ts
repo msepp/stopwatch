@@ -3,11 +3,13 @@
 export const REQUEST_WINDOW_CLOSE    = 'window.close';
 export const REQUEST_WINDOW_MINIMIZE = 'window.minimize';
 export const REQUEST_APP_VERSIONS    = 'get.versions';
-export const REQUEST_ACTIVE_TASK = 'get.active.task';
-export const REQUEST_GROUP_TASKS = 'get.group.tasks';
+export const REQUEST_ACTIVE_TASK     = 'get.active.task';
+export const REQUEST_GROUP_TASKS     = 'get.group.tasks';
 export const REQUEST_GROUPS          = 'get.groups';
 export const REQUEST_ADD_GROUP       = 'add.group';
+export const REQUEST_UPDATE_GROUP    = 'update.group';
 export const REQUEST_ADD_TASK        = 'add.task';
+export const REQUEST_UPDATE_TASK     = 'update.task';
 export const REQUEST_START_TASK      = 'start.task';
 export const REQUEST_STOP_TASK       = 'stop.task';
 export const REQUEST_OPEN_DATABASE   = 'open.database';

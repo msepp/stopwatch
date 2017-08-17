@@ -4,6 +4,7 @@ import * as messaging from '../astilectron/message';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 
 import { Store } from '@ngrx/store';
 import { AppState, Group, Task } from '../model';
@@ -12,6 +13,7 @@ import * as BackendConnActions from '../store/actions/backend-conn.actions';
 import * as GroupsActions from '../store/actions/groups.actions';
 import * as GroupTasksActions from '../store/actions/group-tasks.actions';
 import * as SelectedGroupActions from '../store/actions/selected-group.actions';
+import * as SelectedTaskActions from '../store/actions/selected-task.actions';
 
 @Injectable()
 export class StopwatchService {
@@ -61,29 +63,6 @@ export class StopwatchService {
     return s.asObservable();
   }
 
-  public loadActiveTask(): Observable<Task> {
-    const s = new Subject<Group>();
-
-    this.backend.send(messaging.REQUEST_ACTIVE_TASK, null).subscribe(
-      (m: messaging.Message) => {
-        console.log('loaded active task:', m.data);
-        let task: Task = null;
-
-        if (m.data !== null) {
-          task = Object.assign(new Task, m.data);
-        }
-
-        this.store.dispatch(new ActiveTaskActions.Set(task));
-        s.next(task);
-      },
-      (e: Error) => s.error(e),
-      () => s.complete()
-    );
-
-    return s.asObservable();
-  }
-
-
   public loadGroups(): Observable<Group[]> {
     const s = new Subject<Group[]>();
 
@@ -118,19 +97,14 @@ export class StopwatchService {
     return s.asObservable();
   }
 
-  public addTask(task: Task): Observable<Task> {
-    const s = new Subject<Task>();
+  public saveGroup(group: Group): Observable<Group> {
+    const s = new Subject<Group>();
 
-    this.backend.send(messaging.REQUEST_ADD_TASK, task).subscribe(
+    this.backend.send(messaging.REQUEST_UPDATE_GROUP, group).subscribe(
       (m: messaging.Message) => {
-        const newTask: Task = Object.assign(new Task, m.data);
-
-        // If selected group is the tasks group, then add.
-        if (this._selectedGroup && this._selectedGroup.id === newTask.groupid) {
-          this.store.dispatch(new GroupTasksActions.Add(newTask));
-        }
-
-        s.next(newTask);
+        const newGroup: Group = Object.assign(new Group, m.data);
+        this.store.dispatch(new GroupsActions.Update(newGroup));
+        s.next(newGroup);
       },
       (e: Error) => s.error(e),
       () => s.complete()
@@ -164,6 +138,65 @@ export class StopwatchService {
         () => s.complete()
       );
     });
+
+    return s.asObservable();
+  }
+
+  public loadActiveTask(): Observable<Task> {
+    const s = new Subject<Group>();
+
+    this.backend.send(messaging.REQUEST_ACTIVE_TASK, null).subscribe(
+      (m: messaging.Message) => {
+        console.log('loaded active task:', m.data);
+        let task: Task = null;
+
+        if (m.data !== null) {
+          task = Object.assign(new Task, m.data);
+        }
+
+        this.store.dispatch(new ActiveTaskActions.Set(task));
+        s.next(task);
+      },
+      (e: Error) => s.error(e),
+      () => s.complete()
+    );
+
+    return s.asObservable();
+  }
+
+  public addTask(task: Task): Observable<Task> {
+    const s = new Subject<Task>();
+
+    this.backend.send(messaging.REQUEST_ADD_TASK, task).subscribe(
+      (m: messaging.Message) => {
+        const newTask: Task = Object.assign(new Task, m.data);
+
+        // If selected group is the tasks group, then add.
+        if (this._selectedGroup && this._selectedGroup.id === newTask.groupid) {
+          this.store.dispatch(new GroupTasksActions.Add(newTask));
+        }
+
+        s.next(newTask);
+      },
+      (e: Error) => s.error(e),
+      () => s.complete()
+    );
+
+    return s.asObservable();
+  }
+
+  public saveTask(task: Task): Observable<Task> {
+    const s = new Subject<Task>();
+
+    this.backend.send(messaging.REQUEST_UPDATE_TASK, task).subscribe(
+      (m: messaging.Message) => {
+        const newTask: Task = Object.assign(new Task, m.data);
+        this.store.dispatch(new GroupTasksActions.Update(newTask));
+        s.next(newTask);
+      },
+      (e: Error) => s.error(e),
+      () => s.complete()
+    );
 
     return s.asObservable();
   }
@@ -222,6 +255,30 @@ export class StopwatchService {
         s.next(newTask);
       },
       (e: Error) => s.error(e),
+      () => s.complete()
+    );
+
+    return s.asObservable();
+  }
+
+  public selectTask(tgt: Task): Observable<boolean> {
+    const s = new ReplaySubject<boolean>();
+
+    this.store.select('groupTasks').take(1).subscribe(
+      (tasks: Task[]) => {
+        const task = tasks.find((v) => v.id === tgt.id);
+        if (!task) {
+          s.error(new Error('task not found'));
+          return;
+        }
+
+        console.log('setting selected task to', task);
+        this.store.dispatch(new SelectedTaskActions.Set(task));
+
+        console.log('dispatching true to mark op ready');
+        s.next(true);
+      },
+      e => s.error(e),
       () => s.complete()
     );
 
