@@ -1,7 +1,7 @@
 <div *ngIf="(groups|async)?.length == 0; then noGroups else showGroups"></div>
 <ng-template #showGroups>
+  <div class="md-subheading-2 list-title">Groups</div>
   <md-list>
-    <div class="md-subheading-2">Groups</div>
     <md-list-item *ngFor="let group of groups|async">
       <md-icon md-list-icon>work</md-icon>
       <h4 md-line>{{group.name}}</h4>
@@ -10,5 +10,5 @@
   </md-list>
 </ng-template>
 <ng-template #noGroups>
-  <span>No groups found</span>
+  <span class="not-found-message">No groups found</span>
 </ng-template>
