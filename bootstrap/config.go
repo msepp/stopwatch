@@ -58,8 +58,8 @@ const EmbeddedUIPackageName = "ui/ui.asar"
 // Window size constants. These are both the minimum and default values for
 // application window size.
 const (
-	WindowWidth  = 1024
-	WindowHeight = 768
+	WindowWidth  = 412
+	WindowHeight = 732
 )
 
 // Dimensions describes size in width and height in pixels.

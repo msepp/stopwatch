@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
+import { StopwatchService } from '../services/stopwatch.service';
 import { Group } from '../model';
 
 @Component({
@@ -10,14 +11,19 @@ import { Group } from '../model';
 })
 export class GroupListComponent implements OnInit {
   @Input() groups: Observable<Group[]>;
+
   constructor(
-    private router: Router
+    private router: Router,
+    private stopwatch: StopwatchService
   ) {}
 
   ngOnInit() {
   }
 
   public goTo(group: Group) {
-    this.router.navigate(['/group', group.id]);
+    this.stopwatch.selectGroup(group).subscribe(
+      (g: Group) => this.router.navigate(['/group', group.id]),
+      (e: Error) => console.log('unable to select group')
+    );
   }
 }

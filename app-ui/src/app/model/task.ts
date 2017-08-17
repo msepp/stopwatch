@@ -5,6 +5,6 @@ export class Task {
     public name?: string,
     public costcode?: string,
     public duration?: string,
-    public running?: number
+    public running?: string
   ) {}
 }

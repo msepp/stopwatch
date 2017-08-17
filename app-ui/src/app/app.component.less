@@ -1,9 +1,19 @@
-
-tr, td {
-  text-align: left;
-  border: 1px solid #444;
+:host {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+  min-height: 100%;
 }
 
-td {
-  padding-left: 0.5em;
+.header {
+  flex: 0 0 auto;
+}
+
+.content {
+  flex: 1 0 auto;
+  display: flex;
+  padding: 0;
+  flex-direction: column;
+  box-sizing: border-box;
 }

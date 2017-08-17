@@ -1,8 +1,7 @@
-
 <div *ngIf="ready; then render else wait"></div>
 <ng-template #render>
-  <app-active-task></app-active-task>
-  <router-outlet></router-outlet>
+  <div class="header mat-typography"><app-active-task></app-active-task></div>
+  <div class="content mat-typography"><router-outlet></router-outlet></div>
 </ng-template>
 <ng-template #wait>
   <md-spinner></md-spinner>

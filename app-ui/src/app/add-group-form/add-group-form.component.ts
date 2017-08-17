@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { StopwatchService } from '../services/stopwatch.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormGroupDirective } from '@angular/forms';
 
 @Component({
   selector: 'app-add-group-form',
@@ -9,6 +9,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class AddGroupFormComponent implements OnInit {
   public group: FormGroup;
+  @ViewChild(FormGroupDirective) groupForm;
 
   constructor(
     private stopwatch: StopwatchService,
@@ -24,7 +25,11 @@ export class AddGroupFormComponent implements OnInit {
   public add() {
     if (this.group.valid) {
       this.stopwatch.addGroup(this.group.value).subscribe(
-        () => this.group.reset(),
+        () => {
+          console.log('added group');
+          this.group.reset({name: ''});
+          this.groupForm.resetForm();
+        },
         e => console.log('error', e)
       );
     }

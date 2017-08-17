@@ -1,3 +1,25 @@
-<p>
-  group-details works!
-</p>
+<div class="navigation">
+  <button md-icon-button color="primary" (click)="goBack()"><md-icon>arrow_back</md-icon></button>
+</div>
+<div class="listing">
+  <div *ngIf="(tasks$|async)?.length == 0;then noTasks else showTasks"></div>
+  <ng-template #showTasks>
+    <md-list>
+      <div class="md-subheading-2">Tasks</div>
+      <md-list-item *ngFor="let task of tasks$|async">
+        <md-icon md-list-icon>timer</md-icon>
+        <h4 md-line>{{task.costcode}} - {{task.name}}</h4>
+        <p md-line *ngIf="!task.running">Time used: {{task.duration|taskDuration}}</p>
+        <p md-line *ngIf="task.running">running</p>
+        <button md-icon-button *ngIf="!task.running" color="primary" (click)="startTask(task)"><md-icon>play_circle_filled</md-icon></button>
+        <button md-icon-button *ngIf="task.running" color="accent" (click)="stopTask(task)"><md-icon>stop</md-icon></button>
+      </md-list-item>
+    </md-list>
+  </ng-template>
+  <ng-template #noTasks>
+    <span>No tasks found.</span>
+  </ng-template>
+</div>
+<div class="form">
+  <app-add-task-form></app-add-task-form>
+</div>

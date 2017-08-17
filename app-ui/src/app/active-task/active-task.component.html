@@ -1,18 +1,14 @@
 <div *ngIf="active; then showActive else showInactive"></div>
-
 <ng-template #showInactive>
-  <md-card>
-    <md-card-title>Active task</md-card-title>
-    <md-card-subtitle>no task active</md-card-subtitle>
-  </md-card>
+  <span class="name mat-title">No task active</span>
 </ng-template>
 
 <ng-template #showActive>
-  <md-card>
-    <md-card-title>Active task</md-card-title>
-    <md-card-subtitle>{{active.name}}</md-card-subtitle>
-    <md-card-content>
-      Running since {{active.running|date:'medium'}}
-    </md-card-content>
-  </md-card>
+  <section class="name-container">
+    <span class="name mat-title">{{active.name}}</span>
+    <span class="costcode mat-caption">{{active.costcode}} - {{elapsed}}</span>
+  </section>
+  <section class="button">
+    <button md-icon-button color="accent" (click)="stop()"><md-icon>stop</md-icon></button>
+  </section>
 </ng-template>

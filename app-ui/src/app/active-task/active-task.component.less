@@ -1,0 +1,31 @@
+:host {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  margin: 0;
+  background-color: #eee;
+  border-bottom: 1px solid #ccc;
+  align-items: center;
+  align-content: center;
+  min-height: 70px;
+  box-sizing: border-box;
+}
+
+.name, .elapsed {
+  margin-bottom: 0;
+}
+
+.name {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.name-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

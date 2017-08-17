@@ -1,13 +1,14 @@
-<div *ngIf="groups|async; then list else loading"></div>
-<ng-template #list>
+<div *ngIf="(groups|async)?.length == 0; then noGroups else showGroups"></div>
+<ng-template #showGroups>
   <md-list>
-    <h3 md-subheader>Groups</h3>
+    <div class="md-subheading-2">Groups</div>
     <md-list-item *ngFor="let group of groups|async">
       <md-icon md-list-icon>work</md-icon>
       <h4 md-line (click)="goTo(group)">{{group.name}}</h4>
+      <button md-icon-button color="primary" (click)="goTo(group)"><md-icon>arrow_forward</md-icon></button>
     </md-list-item>
   </md-list>
 </ng-template>
-<ng-template #loading>
-  <md-spinner></md-spinner>
+<ng-template #noGroups>
+  <span>No groups found</span>
 </ng-template>

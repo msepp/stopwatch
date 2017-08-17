@@ -27,6 +27,8 @@ import { GroupListComponent } from './group-list/group-list.component';
 import { AddGroupFormComponent } from './add-group-form/add-group-form.component';
 import { GroupsHomeComponent } from './groups-home/groups-home.component';
 import { GroupDetailsComponent } from './group-details/group-details.component';
+import { TaskDurationPipe } from './task-duration.pipe';
+import { AddTaskFormComponent } from './add-task-form/add-task-form.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +37,9 @@ import { GroupDetailsComponent } from './group-details/group-details.component';
     GroupListComponent,
     AddGroupFormComponent,
     GroupsHomeComponent,
-    GroupDetailsComponent
+    GroupDetailsComponent,
+    TaskDurationPipe,
+    AddTaskFormComponent
   ],
   imports: [
     BrowserModule,
