@@ -15,7 +15,7 @@ Uses [go-astilectron](https://github.com/asticode/go-astilectron) for Golang/Ele
 
 ## Screenshot
 
-![Group view](https://github.com/msepp/stopwatch/screenshot.png "Group view screenshot")
+![Group view](https://raw.githubusercontent.com/msepp/stopwatch/master/screenshot.png "Group view screenshot")
 
 ## Requirements
 
