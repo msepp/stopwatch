@@ -1,15 +1,21 @@
-# go-astilectron-template
+# Stopwatch
 
-A project template for building desktop apps with Golang, Electron and Angular.
+A simple software for tracking time spent on different tasks.
 
 Uses [go-astilectron](https://github.com/asticode/go-astilectron) for Golang/Electron binding.
 
-This is meant to be a template, a base for a project that you modify and extend to implement the features you need. As such I won't be covering all different use cases in the code. It might be more insightful to view this as an example than anything else.
-
 ## Features
- * Add tasks
- * Start & Stop timer per task
- * Get accumulated time spent per project, task.
+ * Add tasks, grouped into named groups.
+ * Start & Stop timer per task.
+ * Edit groups & task details.
+
+## TODO
+ * Generate reports of time spent from selected time periods
+ * Editing of recorded time to fix mishaps (eg. forgot to stop task).
+
+## Screenshot
+
+![Group view](https://github.com/msepp/stopwatch/screenshot.png "Group view screenshot")
 
 ## Requirements
 
@@ -28,28 +34,15 @@ This is meant to be a template, a base for a project that you modify and extend 
    * `go get -u github.com/asticode/go-astilectron`
  * Windows builds tested using git bash.
 
-## Usage
+## Building
 
 Make sure you have the requirements installed and run the following commands:
 
 ```sh
-go get -u github.com/msepp/go-astilectron-template/...
-cd $GOPATH/src/github.com/msepp/go-astilectron-template/example
+go get -u github.com/msepp/stopwatch/...
+cd $GOPATH/src/github.com/msepp/stopwatch
 make
 ```
 This will build the sample for your OS/Arch, if supported.
 
-Building non-host targets happens with `make go-astilectron-template-GOOS-ARCH[.exe]`, where GOOS, ARCH should be replaced with target values.
-
-Just copy the example directory and you should now have a working base for a GUI applicaton project.
-
-## Changing electron/astilectron version
-
-Different versions of Electron or Astilectron can be used by specifying the target versions in the main Makefile. When changed, new versions will be downloaded at next build.
-
-## Wrinkles
-
- * Darwin builds are not supported (but maybe are easy to add) since I have no way to verify functionality atm.
- * Uses a `restmpl.go` file for empty resources bundle to make automated builds faster when using IDEs. This file is swapped for the generated resources during build.
- * Does not support development builds for UI atm, but devTools can be enabled/disabled in `Makefile`.
- * Building on a 32bit host most likely won't work due to limited address space. Use 64bit host and cross-compile.
+Building non-host targets happens with `make stopwatch-GOOS-ARCH[.exe]`, where GOOS, ARCH should be replaced with target values.
