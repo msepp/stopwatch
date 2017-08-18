@@ -48,3 +48,16 @@ body {
   width: 100%;
   min-height: 100vh;
 }
+
+&::-webkit-scrollbar {
+  width: 10px;
+  background: #444;
+}
+
+&::-webkit-scrollbar-thumb {
+  background: lighten(#ff4081, 10%);
+
+  &:hover {
+    background: #ff4081;
+  }
+}

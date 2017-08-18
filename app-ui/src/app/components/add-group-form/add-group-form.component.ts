@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormGroupDirective } from '@angular/forms';
 import { StopwatchService } from '../../services/stopwatch.service';
+import { ErrorService } from '../../services/error.service';
 
 @Component({
   selector: 'app-add-group-form',
@@ -13,7 +14,8 @@ export class AddGroupFormComponent implements OnInit {
 
   constructor(
     private stopwatch: StopwatchService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private err: ErrorService
   ) { }
 
   ngOnInit() {
@@ -30,7 +32,7 @@ export class AddGroupFormComponent implements OnInit {
           this.group.reset({name: ''});
           this.groupForm.resetForm();
         },
-        e => console.log('error', e)
+        (e: Error) => this.err.log(e)
       );
     }
   }

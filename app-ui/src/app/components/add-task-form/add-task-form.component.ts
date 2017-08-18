@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, FormGroupDirective } from '@angular
 import { Store } from '@ngrx/store';
 import { AppState, Group, Task } from '../../model';
 import { StopwatchService } from '../../services/stopwatch.service';
+import { ErrorService } from '../../services/error.service';
 
 @Component({
   selector: 'app-add-task-form',
@@ -18,7 +19,8 @@ export class AddTaskFormComponent implements OnInit, OnDestroy {
   constructor(
     private stopwatch: StopwatchService,
     private fb: FormBuilder,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private err: ErrorService
   ) {
     this.group$ = this.store.select('selectedGroup').subscribe(g => this.group = g);
   }
@@ -47,7 +49,7 @@ export class AddTaskFormComponent implements OnInit, OnDestroy {
           this.taskFG.reset();
           this.taskForm.resetForm();
         },
-        e => console.log('error adding task:', e)
+        (e: Error) => this.err.log(e)
       );
     }
   }

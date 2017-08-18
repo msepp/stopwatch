@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { StopwatchService } from '../../services/stopwatch.service';
+import { ErrorService } from '../../services/error.service';
 import { Task, AppState } from '../../model';
 
 @Component({
@@ -18,6 +19,7 @@ export class ActiveTaskComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<AppState>,
     private stopwatch: StopwatchService,
+    private err: ErrorService
   ) {
     this.task$ = this.store.select('activeTask').subscribe(
       (t: Task) => {
@@ -65,6 +67,9 @@ export class ActiveTaskComponent implements OnInit, OnDestroy {
   }
 
   stop() {
-    this.stopwatch.stopTask(this.active);
+    this.stopwatch.stopTask(this.active).subscribe(
+      () => {},
+      (e: Error) => this.err.log(e)
+    );
   }
 }

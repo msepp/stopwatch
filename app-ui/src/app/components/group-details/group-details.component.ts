@@ -5,6 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
 import { StopwatchService } from '../../services/stopwatch.service';
+import { ErrorService } from '../../services/error.service';
 import { AppState, Group, Task } from '../../model';
 
 @Component({
@@ -21,7 +22,8 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
     private store: Store<AppState>,
     private location: Location,
     private stopwatch: StopwatchService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private err: ErrorService
   ) { }
 
   ngOnInit() {
@@ -52,7 +54,7 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
     if (this.groupForm.valid) {
       this.stopwatch.saveGroup(this.groupForm.value).subscribe(
         () => {},
-        e => console.log('error saving', e)
+        (e: Error) => this.err.log(e)
       );
     }
   }

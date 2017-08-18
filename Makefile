@@ -10,7 +10,7 @@
 
 # Set to true to have dev tools in build, set to false or disabled for
 # prodution builds to omit devtools access
-ENABLE_DEV_TOOLS := false
+ENABLE_DEV_TOOLS := true
 
 # Set to true to make app unpack assets to temp at lauch. Will cause assets to
 # be always unpacked at start and deleted when app closes. If false, assets are

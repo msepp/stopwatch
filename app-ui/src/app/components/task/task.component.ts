@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { StopwatchService } from '../../services/stopwatch.service';
+import { ErrorService } from '../../services/error.service';
 import { Task } from '../../model';
 
 @Component({
@@ -13,7 +14,8 @@ export class TaskComponent implements OnInit {
 
   constructor(
     private stopwatch: StopwatchService,
-    private router: Router
+    private router: Router,
+    private err: ErrorService
   ) { }
 
   ngOnInit() {
@@ -22,26 +24,22 @@ export class TaskComponent implements OnInit {
   public startTask(t: Task) {
     this.stopwatch.startTask(t).subscribe(
       () => {},
-      e => console.log('error starting:', e)
+      (e: Error) => this.err.log(e)
     );
   }
 
   public stopTask(t: Task) {
     this.stopwatch.stopTask(t).subscribe(
       () => {},
-      e => console.log('error stopping:', e)
+      (e: Error) => this.err.log(e)
     );
   }
 
   public editTask(t: Task) {
     console.log('selecting task', t);
     this.stopwatch.selectTask(t).subscribe(
-      () => {
-        console.log('navigating...');
-        this.router.navigate(['/task', t.groupid + '-' + t.id]);
-      },
-      e => console.log('error selecting task:', e),
-      () => console.log('select done')
+      () => this.router.navigate(['/task', t.groupid + '-' + t.id]),
+      (e: Error) => this.err.log(e)
     );
   }
 }

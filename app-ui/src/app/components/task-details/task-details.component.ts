@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
 import { StopwatchService } from '../../services/stopwatch.service';
+import { ErrorService } from '../../services/error.service';
 import { AppState, Group, Task } from '../../model';
 
 @Component({
@@ -22,7 +23,8 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private location: Location,
     private stopwatch: StopwatchService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private err: ErrorService
   ) { }
 
   ngOnInit() {
@@ -55,7 +57,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     if (this.taskFG.valid) {
       this.stopwatch.saveTask(this.taskFG.value).subscribe(
         () => {},
-        e => console.log('error saving', e)
+        (e: Error) => this.err.log(e)
       );
     }
   }

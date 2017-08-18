@@ -46,10 +46,7 @@ export class StopwatchService {
 
     console.log('not initialized yet, doing now');
     this.backend.isReady.filter(v => v === true).take(1).concatMap(() =>
-      this.backend.send(messaging.REQUEST_OPEN_DATABASE, null).map((m: messaging.Message) => {
-        console.log('now ready');
-        return true;
-      })
+      this.backend.send(messaging.REQUEST_OPEN_DATABASE, null).map(() => true)
     ).subscribe(
       () => {
         this._ready = true;

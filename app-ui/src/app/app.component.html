@@ -4,5 +4,8 @@
   <div class="content mat-typography"><router-outlet></router-outlet></div>
 </ng-template>
 <ng-template #wait>
-  <md-spinner></md-spinner>
+  <div class="loader mat-typography">
+    <md-spinner></md-spinner>
+    <span class="mat-subheading-1">Loading...</span>
+  </div>
 </ng-template>

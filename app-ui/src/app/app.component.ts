@@ -14,6 +14,7 @@ import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms'
 
 import { AppVersion, Group, Task } from './model';
 import { StopwatchService } from './services/stopwatch.service';
+import { ErrorService } from './services/error.service';
 
 @Component({
   selector: 'app-root',
@@ -25,7 +26,8 @@ export class AppComponent implements OnInit {
 
   constructor(
     private stopwatch: StopwatchService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private err: ErrorService
   ) {
     this.store.select('backendConn')
       .filter(ok => (ok === true))
@@ -34,11 +36,14 @@ export class AppComponent implements OnInit {
       .concatMap(() => this.stopwatch.loadActiveTask())
       .subscribe(
         () => { console.log('ready'); this.ready = true; },
-        e => console.log('error:', e)
+        (e: Error) => this.err.log(e)
       );
   }
 
   public ngOnInit() {
-    this.stopwatch.init();
+    this.stopwatch.init().subscribe(
+      () => {},
+      (e: Error) => this.err.log(e)
+    );
   }
 }

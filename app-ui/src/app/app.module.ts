@@ -13,6 +13,7 @@ import { AppComponent } from './app.component';
 import { AstilectronModule } from './astilectron';
 import { TaskDurationPipe } from './task-duration.pipe';
 import { StopwatchService } from './services/stopwatch.service';
+import { ErrorService } from './services/error.service';
 
 // Components
 import { ActiveTaskComponent } from './components/active-task/active-task.component';
@@ -80,7 +81,8 @@ import { GroupTasksEffects } from './store/effects/group-tasks.effects';
     AstilectronModule
   ],
   providers: [
-    StopwatchService
+    StopwatchService,
+    ErrorService
   ],
   bootstrap: [AppComponent]
 })
