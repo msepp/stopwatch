@@ -1,0 +1,10 @@
+<div class="mat-subheading-2 list-title">Previous tasks</div>
+<div *ngIf="(tasks|async)?.length == 0; then noTasks else showHistory"></div>
+<ng-template #showHistory>
+  <md-list>
+    <app-task *ngFor="let task of tasks|async" [task]="task"></app-task>
+  </md-list>
+</ng-template>
+<ng-template #noTasks>
+  <span class="not-found-message">Nothing yet</span>
+</ng-template>

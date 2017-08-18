@@ -5,8 +5,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
-import { StopwatchService } from '../services/stopwatch.service';
-import { AppState, Group, Task } from '../model';
+import { StopwatchService } from '../../services/stopwatch.service';
+import { AppState, Group, Task } from '../../model';
 
 @Component({
   selector: 'app-task-details',

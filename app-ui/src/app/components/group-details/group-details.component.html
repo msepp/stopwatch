@@ -11,19 +11,11 @@
   </form>
 </div>
 <div class="listing">
+  <div class="mat-subheading-2 list-title">Tasks</div>
   <div *ngIf="(tasks$|async)?.length == 0;then noTasks else showTasks"></div>
   <ng-template #showTasks>
-    <div class="md-subheading-2 list-title">Tasks</div>
     <md-list>
-      <md-list-item *ngFor="let task of tasks$|async">
-        <md-icon md-list-icon>timer</md-icon>
-        <h4 md-line>{{task.costcode}} - {{task.name}}</h4>
-        <p md-line *ngIf="!task.running">Time used: {{task.duration|taskDuration}}</p>
-        <p md-line *ngIf="task.running">running</p>
-        <button md-icon-button (click)="editTask(task)"><md-icon>mode_edit</md-icon></button>
-        <button md-icon-button *ngIf="!task.running" color="primary" (click)="startTask(task)"><md-icon>play_circle_filled</md-icon></button>
-        <button md-icon-button *ngIf="task.running" color="accent" (click)="stopTask(task)"><md-icon>stop</md-icon></button>
-      </md-list-item>
+      <app-task *ngFor="let task of tasks$|async" [task]="task"></app-task>
     </md-list>
   </ng-template>
   <ng-template #noTasks>

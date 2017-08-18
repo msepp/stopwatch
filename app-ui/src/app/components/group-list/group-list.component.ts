@@ -1,8 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
-import { StopwatchService } from '../services/stopwatch.service';
-import { Group } from '../model';
+import { StopwatchService } from '../../services/stopwatch.service';
+import { Group } from '../../model';
 
 @Component({
   selector: 'app-group-list',

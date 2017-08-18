@@ -1,12 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
-import { StopwatchService } from '../services/stopwatch.service';
-import { AppState, Group, Task } from '../model';
+import { StopwatchService } from '../../services/stopwatch.service';
+import { AppState, Group, Task } from '../../model';
 
 @Component({
   selector: 'app-group-details',
@@ -20,7 +19,6 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<AppState>,
-    private router: Router,
     private location: Location,
     private stopwatch: StopwatchService,
     private fb: FormBuilder
@@ -57,31 +55,5 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
         e => console.log('error saving', e)
       );
     }
-  }
-
-  public startTask(t: Task) {
-    this.stopwatch.startTask(t).subscribe(
-      () => {},
-      e => console.log('error starting:', e)
-    );
-  }
-
-  public stopTask(t: Task) {
-    this.stopwatch.stopTask(t).subscribe(
-      () => {},
-      e => console.log('error stopping:', e)
-    );
-  }
-
-  public editTask(t: Task) {
-    console.log('selecting task', t);
-    this.stopwatch.selectTask(t).subscribe(
-      () => {
-        console.log('navigating...');
-        this.router.navigate(['/task', t.groupid + '-' + t.id]);
-      },
-      e => console.log('error selecting task:', e),
-      () => console.log('select done')
-    );
   }
 }

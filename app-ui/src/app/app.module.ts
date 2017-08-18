@@ -7,12 +7,23 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { MaterialModule } from '@angular/material';
 import { RouterModule } from '@angular/router';
+import './rxjs-operators';
 
 import { AppComponent } from './app.component';
 import { AstilectronModule } from './astilectron';
+import { TaskDurationPipe } from './task-duration.pipe';
 import { StopwatchService } from './services/stopwatch.service';
 
-import './rxjs-operators';
+// Components
+import { ActiveTaskComponent } from './components/active-task/active-task.component';
+import { GroupListComponent } from './components/group-list/group-list.component';
+import { AddGroupFormComponent } from './components/add-group-form/add-group-form.component';
+import { GroupsHomeComponent } from './components/groups-home/groups-home.component';
+import { GroupDetailsComponent } from './components/group-details/group-details.component';
+import { AddTaskFormComponent } from './components/add-task-form/add-task-form.component';
+import { TaskDetailsComponent } from './components/task-details/task-details.component';
+import { TaskHistoryComponent } from './components/task-history/task-history.component';
+import { TaskComponent } from './components/task/task.component';
 
 // Store reducers
 import { ActiveTaskReducer } from './store/reducers/active-task.reducers';
@@ -22,14 +33,10 @@ import { GroupsReducer } from './store/reducers/groups.reducers';
 import { SelectedGroupReducer } from './store/reducers/selected-group.reducers';
 import { SelectedTaskReducer } from './store/reducers/selected-task.reducers';
 import { VersionReducer } from './store/reducers/version.reducers';
-import { ActiveTaskComponent } from './active-task/active-task.component';
-import { GroupListComponent } from './group-list/group-list.component';
-import { AddGroupFormComponent } from './add-group-form/add-group-form.component';
-import { GroupsHomeComponent } from './groups-home/groups-home.component';
-import { GroupDetailsComponent } from './group-details/group-details.component';
-import { TaskDurationPipe } from './task-duration.pipe';
-import { AddTaskFormComponent } from './add-task-form/add-task-form.component';
-import { TaskDetailsComponent } from './task-details/task-details.component';
+import { TaskHistoryReducer } from './store/reducers/task-history.reducers';
+
+// Effects
+import { GroupTasksEffects } from './store/effects/group-tasks.effects';
 
 @NgModule({
   declarations: [
@@ -41,7 +48,9 @@ import { TaskDetailsComponent } from './task-details/task-details.component';
     GroupDetailsComponent,
     TaskDurationPipe,
     AddTaskFormComponent,
-    TaskDetailsComponent
+    TaskDetailsComponent,
+    TaskHistoryComponent,
+    TaskComponent
   ],
   imports: [
     BrowserModule,
@@ -62,9 +71,12 @@ import { TaskDetailsComponent } from './task-details/task-details.component';
       activeTask: ActiveTaskReducer,
       groups: GroupsReducer,
       groupTasks: GroupTasksReducer,
-      version: VersionReducer
+      version: VersionReducer,
+      taskHistory: TaskHistoryReducer
     }),
-    EffectsModule.forRoot([]),
+    EffectsModule.forRoot([
+      GroupTasksEffects
+    ]),
     AstilectronModule
   ],
   providers: [

@@ -15,7 +15,7 @@ export function GroupTasksReducer(state: Group[] = [], action: Action): Group[] 
       return state;
     }
 
-    case GroupTasksActions.UPDATE_TASK: {
+    case GroupTasksActions.TASK_UPDATED: {
       const idx = state.findIndex(v => v.id === action.payload.id);
       if (idx === -1) {
         return state;

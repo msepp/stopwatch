@@ -15,4 +15,11 @@ export class Clear implements Action {
   constructor() {}
 }
 
-export type All = Clear | Set;
+export const UPDATE_ACTIVE_TASK = '[active task] UPDATE';
+export class Update implements Action {
+  readonly type = UPDATE_ACTIVE_TASK;
+  constructor(public payload: Task) {}
+}
+
+
+export type All = Clear | Set | Update;

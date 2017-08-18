@@ -1,8 +1,8 @@
 import { Component, ViewChild, OnInit, OnDestroy} from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormGroupDirective } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { AppState, Group, Task } from '../model';
-import { StopwatchService } from '../services/stopwatch.service';
+import { AppState, Group, Task } from '../../model';
+import { StopwatchService } from '../../services/stopwatch.service';
 
 @Component({
   selector: 'app-add-task-form',

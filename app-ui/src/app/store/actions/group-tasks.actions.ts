@@ -20,6 +20,12 @@ export class Update implements Action {
   constructor(public payload: Task) {}
 }
 
+export const TASK_UPDATED = '[group tasks] UPDATED';
+export class Updated implements Action {
+  readonly type = TASK_UPDATED;
+  constructor(public payload: Task) {}
+}
+
 export const START_TASK = '[group tasks] START';
 export class Start implements Action {
   readonly type = START_TASK;
@@ -32,4 +38,4 @@ export class Stop implements Action {
   constructor(public payload: Task) {}
 }
 
-export type All = Set | Add | Update | Start | Stop;
+export type All = Set | Add | Update | Updated | Start | Stop;

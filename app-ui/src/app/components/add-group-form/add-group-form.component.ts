@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { StopwatchService } from '../services/stopwatch.service';
 import { FormBuilder, FormGroup, Validators, FormGroupDirective } from '@angular/forms';
+import { StopwatchService } from '../../services/stopwatch.service';
 
 @Component({
   selector: 'app-add-group-form',

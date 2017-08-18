@@ -14,6 +14,22 @@ export function ActiveTaskReducer(state: Task = null, action: Action): Task {
       return null;
     }
 
+    case ActiveTaskActions.UPDATE_ACTIVE_TASK: {
+      if (state === null) {
+        return state;
+      }
+
+      if (
+        state &&
+        (action.payload.id === state.id) &&
+        (action.payload.groupid === state.groupid)
+      ) {
+        return action.payload;
+      }
+
+      return state;
+    }
+
     default:
       return state;
   };

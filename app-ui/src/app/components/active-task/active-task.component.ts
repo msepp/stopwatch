@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { StopwatchService } from '../services/stopwatch.service';
-import { Task, AppState } from '../model';
+import { StopwatchService } from '../../services/stopwatch.service';
+import { Task, AppState } from '../../model';
 
 @Component({
   selector: 'app-active-task',

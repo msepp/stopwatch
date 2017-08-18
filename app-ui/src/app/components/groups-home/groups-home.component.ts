@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { AppState, Group } from '../model';
+import { AppState, Group } from '../../model';
 
 @Component({
   selector: 'app-groups-home',

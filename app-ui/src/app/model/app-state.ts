@@ -5,6 +5,7 @@ export class AppState {
     public backendConn: boolean,
     public activeTask?: Task,
     public groupTasks?: Task[],
+    public taskHistory?: Task[],
     public groups?: Group[],
     public selectedGroup?: Group,
     public selectedTask?: Task,

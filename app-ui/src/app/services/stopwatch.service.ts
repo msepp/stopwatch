@@ -14,6 +14,7 @@ import * as GroupsActions from '../store/actions/groups.actions';
 import * as GroupTasksActions from '../store/actions/group-tasks.actions';
 import * as SelectedGroupActions from '../store/actions/selected-group.actions';
 import * as SelectedTaskActions from '../store/actions/selected-task.actions';
+import * as TaskHistoryActions from '../store/actions/task-history.actions';
 
 @Injectable()
 export class StopwatchService {
@@ -226,6 +227,7 @@ export class StopwatchService {
           const newTask: Task = Object.assign(new Task, m.data);
           this.store.dispatch(new GroupTasksActions.Update(newTask));
           this.store.dispatch(new ActiveTaskActions.Set(newTask));
+          this.store.dispatch(new TaskHistoryActions.Remove(newTask));
           s.next(newTask);
         },
         (e: Error) => s.error(e),
@@ -252,6 +254,8 @@ export class StopwatchService {
         }
 
         this.store.dispatch(new GroupTasksActions.Update(newTask));
+        this.store.dispatch(new TaskHistoryActions.Push(newTask));
+
         s.next(newTask);
       },
       (e: Error) => s.error(e),
