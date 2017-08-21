@@ -7,12 +7,13 @@ import (
 	"log"
 
 	"github.com/msepp/stopwatch/bootstrap"
+	"github.com/msepp/stopwatch/stopwatchdb"
 )
 
 // Various handles that are used globally
 var gState = struct {
 	app *bootstrap.App
-	db  *StopwatchDB
+	db  *stopwatchdb.StopwatchDB
 }{}
 
 func main() {

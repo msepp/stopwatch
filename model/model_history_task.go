@@ -1,4 +1,4 @@
-package main
+package model
 
 // HistoryTask is a task entry in task history
 type HistoryTask struct {

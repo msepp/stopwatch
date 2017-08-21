@@ -1,4 +1,4 @@
-package main
+package model
 
 // Group defines a single group
 type Group struct {

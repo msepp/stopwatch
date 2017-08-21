@@ -1,4 +1,4 @@
-package main
+package model
 
 // ActiveTask identifies currently active task
 type ActiveTask struct {

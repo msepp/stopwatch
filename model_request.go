@@ -1,5 +1,7 @@
 package main
 
+import "github.com/msepp/stopwatch/model"
+
 // ReqPayloadAddGroup defines data fields available when adding a group
 type ReqPayloadAddGroup struct {
 	// Name of the new group. Required.
@@ -22,7 +24,7 @@ type ReqPayloadGetGroupTasks struct {
 
 // ReqPayloadSetHistory is the payload for updating task usage history
 type ReqPayloadSetHistory struct {
-	History []HistoryTask `json:"history" mapstructure:"history"`
+	History []model.HistoryTask `json:"history" mapstructure:"history"`
 }
 
 // ReqPayloadAddTask defines data fields available when adding a task

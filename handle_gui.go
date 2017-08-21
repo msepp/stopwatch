@@ -6,6 +6,7 @@ import (
 
 	"github.com/msepp/stopwatch/bootstrap"
 	"github.com/msepp/stopwatch/message"
+	"github.com/msepp/stopwatch/stopwatchdb"
 )
 
 // HandleGUIMessage is called when we receive messages from the user interface.
@@ -72,7 +73,7 @@ func HandleGetAppVersions(msg *message.Message) (interface{}, error) {
 // succeeded.
 func HandleOpenDatabase(msg *message.Message) (interface{}, error) {
 	if gState.db == nil {
-		gState.db = NewStopwatchDB()
+		gState.db = stopwatchdb.New()
 	}
 
 	rootdir, err := bootstrap.PersistentDataDir()
