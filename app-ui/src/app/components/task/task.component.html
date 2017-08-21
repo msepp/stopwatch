@@ -3,7 +3,7 @@
   <h4 md-line>{{task.costcode}} - {{task.name}}</h4>
   <p md-line *ngIf="!task.running">Time used: {{task.duration|taskDuration}}</p>
   <p md-line *ngIf="task.running">running</p>
-  <button md-icon-button (click)="editTask(task)"><md-icon>mode_edit</md-icon></button>
-  <button md-icon-button *ngIf="!task.running" color="primary" (click)="startTask(task)"><md-icon>play_circle_filled</md-icon></button>
-  <button md-icon-button *ngIf="task.running" color="accent" (click)="stopTask(task)"><md-icon>stop</md-icon></button>
+  <button md-icon-button (click)="editTask(task)" title="Edit"><md-icon>mode_edit</md-icon></button>
+  <button md-icon-button *ngIf="!task.running" color="primary" (click)="startTask(task)" title="Start"><md-icon>play_circle_filled</md-icon></button>
+  <button md-icon-button *ngIf="task.running" color="accent" (click)="stopTask(task)" title="Stop"><md-icon>stop</md-icon></button>
 </md-list-item>

@@ -1,5 +1,5 @@
 <div class="navigation">
-  <button md-icon-button color="primary" (click)="goBack()"><md-icon>arrow_back</md-icon></button>
+  <button md-icon-button color="primary" (click)="goBack()" title="Back"><md-icon>arrow_back</md-icon></button>
 </div>
 <div class="nameform">
   <form [formGroup]="groupForm" novalidate (submit)="saveGroup()">
@@ -7,7 +7,7 @@
       <input mdInput placeholder="Group name" formControlName="name">
       <md-error>Name is required</md-error>
     </md-input-container>
-    <button md-icon-button><md-icon>vertical_align_bottom</md-icon></button>
+    <button md-icon-button title="Save"><md-icon>vertical_align_bottom</md-icon></button>
   </form>
 </div>
 <div class="listing">
