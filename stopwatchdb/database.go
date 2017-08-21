@@ -234,6 +234,23 @@ func (db *StopwatchDB) StopTask(group, task int) (*model.Task, error) {
 		now := time.Now().UTC()
 		d = now.Sub(start)
 
+		// If current slice and end point are on separate dates, we split into extra
+		// slices to avoid having slices that span multiple days.
+		for start.Year() != now.Year() || start.Month() != now.Month() || start.Day() != now.Day() {
+			// End at next day...
+			end := time.Date(start.Year(), start.Month(), start.Day()+1, 0, 0, 0, 0, time.UTC)
+			// Minus 1 second, so last second of starting date.
+			end = end.Add(time.Second * -1)
+
+			if err := b.Put(k, []byte(end.Format(time.RFC3339))); err != nil {
+				return err
+			}
+
+			// Next start is at the start of next day
+			start = end.Add(time.Second)
+			k = []byte(start.Format(time.RFC3339))
+		}
+
 		return b.Put(k, []byte(now.Format(time.RFC3339)))
 	})
 

@@ -1,4 +1,5 @@
 stopwatch-*
+stopwatch
 *.res
 resources/runtime
 resources/ui
