@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"path"
 
@@ -12,35 +13,39 @@ import (
 // HandleGUIMessage is called when we receive messages from the user interface.
 func HandleGUIMessage(msg *message.Message) (interface{}, error) {
 	switch msg.Key {
-	case message.RequestAppVersions:
-		return HandleGetAppVersions(msg)
-
-	case message.RequestOpenDatabase:
-		return HandleOpenDatabase(msg)
-
-	case message.RequestGroups:
-		return HandleGetGroups(msg)
 
 	case message.RequestActiveTask:
 		return HandleGetActiveTask(msg)
 
-	case message.RequestGroupTasks:
-		return HandleGetGroupTasks(msg)
-
 	case message.RequestAddGroup:
 		return HandleAddGroup(msg)
-
-	case message.RequestUpdateGroup:
-		return HandleUpdateGroup(msg)
-
-	case message.RequestGetTask:
-		return HandleGetTask(msg)
 
 	case message.RequestAddTask:
 		return HandleAddTask(msg)
 
-	case message.RequestUpdateTask:
-		return HandleUpdateTask(msg)
+	case message.RequestAppVersions:
+		return HandleGetAppVersions(msg)
+
+	case message.RequestGetHistory:
+		return HandleGetHistory(msg)
+
+	case message.RequestGroups:
+		return HandleGetGroups(msg)
+
+	case message.RequestGroupTasks:
+		return HandleGetGroupTasks(msg)
+
+	case message.RequestGetTask:
+		return HandleGetTask(msg)
+
+	case message.RequestGetUsage:
+		return HandleGetUsage(msg)
+
+	case message.RequestOpenDatabase:
+		return HandleOpenDatabase(msg)
+
+	case message.RequestSetHistory:
+		return HandleSetHistory(msg)
 
 	case message.RequestStartTask:
 		return HandleStartTask(msg)
@@ -48,11 +53,11 @@ func HandleGUIMessage(msg *message.Message) (interface{}, error) {
 	case message.RequestStopTask:
 		return HandleStopTask(msg)
 
-	case message.RequestGetHistory:
-		return HandleGetHistory(msg)
+	case message.RequestUpdateGroup:
+		return HandleUpdateGroup(msg)
 
-	case message.RequestSetHistory:
-		return HandleSetHistory(msg)
+	case message.RequestUpdateTask:
+		return HandleUpdateTask(msg)
 
 	default:
 		return nil, fmt.Errorf("Unrecognized GUI message key: %s", msg.Key)
@@ -383,4 +388,26 @@ func HandleStopTask(msg *message.Message) (interface{}, error) {
 
 	// Mark running
 	return gState.db.StopTask(task.GroupID, task.ID)
+}
+
+// HandleGetUsage handle request for usage statistics
+func HandleGetUsage(msg *message.Message) (interface{}, error) {
+	if gState.db == nil {
+		return nil, fmt.Errorf("no database")
+	}
+
+	var payload ReqPayloadGetUsage
+	if err := msg.Into(&payload); err != nil {
+		return nil, fmt.Errorf("payload invalid: %s", err)
+	}
+
+	if payload.GroupID <= 0 {
+		return nil, errors.New("invalid group id")
+	}
+
+	if payload.Start.IsZero() || payload.End.IsZero() {
+		return nil, errors.New("start and end must be defined and not be empty")
+	}
+
+	return gState.db.GetUsage(payload.GroupID, payload.Start, payload.End)
 }

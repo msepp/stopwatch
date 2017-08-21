@@ -17,6 +17,7 @@ const (
 	RequestAddGroup       = Key("add.group")
 	RequestGetHistory     = Key("get.history")
 	RequestGetTask        = Key("get.task")
+	RequestGetUsage       = Key("get.usage")
 	RequestGroups         = Key("get.groups")
 	RequestGroupTasks     = Key("get.group.tasks")
 	RequestSetHistory     = Key("set.history")

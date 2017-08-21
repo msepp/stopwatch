@@ -1,6 +1,10 @@
 package main
 
-import "github.com/msepp/stopwatch/model"
+import (
+	"time"
+
+	"github.com/msepp/stopwatch/model"
+)
 
 // ReqPayloadAddGroup defines data fields available when adding a group
 type ReqPayloadAddGroup struct {
@@ -63,4 +67,14 @@ type ReqPayloadUpdateTask struct {
 	Name string `json:"name" mapstructure:"name"`
 	// CostCode for the task.
 	CostCode string `json:"costcode" mapstructure:"costcode"`
+}
+
+// ReqPayloadGetUsage defines fields for requesting usage statistics for a group
+type ReqPayloadGetUsage struct {
+	// GroupID of the target task. Required.
+	GroupID int `json:"groupid" mapstructure:"groupid"`
+	// Start is the starting date. Required.
+	Start time.Time `json:"start" mapstructure:"start"`
+	// End is the end date. Required.
+	End time.Time `json:"end" mapstructure:"end"`
 }

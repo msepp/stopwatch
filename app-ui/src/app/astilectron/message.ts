@@ -6,6 +6,7 @@ export const REQUEST_APP_VERSIONS    = 'get.versions';
 export const REQUEST_ACTIVE_TASK     = 'get.active.task';
 export const REQUEST_GROUP_TASKS     = 'get.group.tasks';
 export const REQUEST_GROUPS          = 'get.groups';
+export const REQUEST_GET_USAGE       = 'get.usage';
 export const REQUEST_ADD_GROUP       = 'add.group';
 export const REQUEST_UPDATE_GROUP    = 'update.group';
 export const REQUEST_ADD_TASK        = 'add.task';
