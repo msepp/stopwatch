@@ -326,4 +326,19 @@ export class StopwatchService {
 
     return s.asObservable();
   }
+
+  public getUsage(groupid: number, start: string, end: string) {
+    const s = new Subject<any>();
+
+    const data = {groupid, start, end}
+    this.backend.send(messaging.REQUEST_GET_USAGE, data).subscribe(
+      (m: messaging.Message) => {
+        s.next(m.data);
+      },
+      e => s.error(e),
+      () => s.complete()
+    );
+
+    return s.asObservable();
+  }
 }

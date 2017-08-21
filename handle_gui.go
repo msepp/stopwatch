@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"path"
+	"time"
 
 	"github.com/msepp/stopwatch/bootstrap"
 	"github.com/msepp/stopwatch/message"
@@ -405,9 +406,20 @@ func HandleGetUsage(msg *message.Message) (interface{}, error) {
 		return nil, errors.New("invalid group id")
 	}
 
-	if payload.Start.IsZero() || payload.End.IsZero() {
+	var start time.Time
+	var end time.Time
+	var err error
+
+	if start, err = time.Parse("2006-01-02", payload.StartDate); err != nil {
+		return nil, fmt.Errorf("start date invalid: %s", err)
+	}
+	if end, err = time.Parse("2006-01-02", payload.EndDate); err != nil {
+		return nil, fmt.Errorf("end date invalid: %s", err)
+	}
+
+	if start.IsZero() || end.IsZero() {
 		return nil, errors.New("start and end must be defined and not be empty")
 	}
 
-	return gState.db.GetUsage(payload.GroupID, payload.Start, payload.End)
+	return gState.db.GetUsage(payload.GroupID, start, end)
 }

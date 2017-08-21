@@ -17,6 +17,7 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
   public tasks$: Store<Task[]>;
   public groupForm: FormGroup;
   public group$: Subscription;
+  public usage: any;
 
   constructor(
     private store: Store<AppState>,
@@ -48,6 +49,17 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
 
   public goBack() {
     this.location.back();
+  }
+
+  public getUsage() {
+    this.stopwatch.getUsage(
+      this.groupForm.get('id').value,
+      '2017-08-14',
+      '2017-08-21'
+    ).subscribe(
+      data => this.usage = data,
+      (e: Error) => this.err.log(e)
+    );
   }
 
   public saveGroup() {

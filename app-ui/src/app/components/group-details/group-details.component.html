@@ -10,6 +10,10 @@
     <button md-icon-button title="Save"><md-icon>vertical_align_bottom</md-icon></button>
   </form>
 </div>
+<div class="usage">
+  <pre *ngIf="usage">{{usage|json}}</pre>
+  <button md-raised-button (click)="getUsage()">fetch</button>
+</div>
 <div class="listing">
   <div class="mat-subheading-2 list-title">Tasks</div>
   <div *ngIf="(tasks$|async)?.length == 0;then noTasks else showTasks"></div>

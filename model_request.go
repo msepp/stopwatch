@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	"github.com/msepp/stopwatch/model"
 )
 
@@ -73,8 +71,8 @@ type ReqPayloadUpdateTask struct {
 type ReqPayloadGetUsage struct {
 	// GroupID of the target task. Required.
 	GroupID int `json:"groupid" mapstructure:"groupid"`
-	// Start is the starting date. Required.
-	Start time.Time `json:"start" mapstructure:"start"`
-	// End is the end date. Required.
-	End time.Time `json:"end" mapstructure:"end"`
+	// StartDate is the starting date. Required.
+	StartDate string `json:"start" mapstructure:"start"`
+	// EndDate is the end date. Required.
+	EndDate string `json:"end" mapstructure:"end"`
 }

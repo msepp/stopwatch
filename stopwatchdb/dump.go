@@ -24,6 +24,7 @@ type Usage struct {
 func (db *StopwatchDB) GetUsage(group int, start, end time.Time) (*Usage, error) {
 	daily := map[string]map[string]model.TaskDuration{}
 	total := map[string]model.TaskDuration{}
+	dates := []string{}
 
 	tasks := []*model.Task{}
 
@@ -64,6 +65,10 @@ func (db *StopwatchDB) GetUsage(group int, start, end time.Time) (*Usage, error)
 	max := []byte(end.Format(time.RFC3339))
 
 	// Generate dates to result.
+	for start.Before(end) {
+		dates = append(dates, start.Format(dateFmt))
+		start = start.AddDate(0, 0, 1)
+	}
 
 	// Go through each task, day by day.
 	for _, task := range tasks {
@@ -100,10 +105,9 @@ func (db *StopwatchDB) GetUsage(group int, start, end time.Time) (*Usage, error)
 
 				if _, ok := daily[task.CostCode]; !ok {
 					daily[task.CostCode] = map[string]model.TaskDuration{}
-				}
-
-				if _, ok := daily[task.CostCode][date]; !ok {
-					daily[task.CostCode][date] = model.TaskDuration{}
+					for _, d := range dates {
+						daily[task.CostCode][d] = model.TaskDuration{}
+					}
 				}
 
 				if _, ok := total[task.CostCode]; !ok {
