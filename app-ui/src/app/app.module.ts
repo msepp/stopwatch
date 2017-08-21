@@ -5,7 +5,7 @@ import { HttpModule } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { MaterialModule } from '@angular/material';
+import { MaterialModule, MdDatepickerModule, MdNativeDateModule } from '@angular/material';
 import { RouterModule } from '@angular/router';
 import './rxjs-operators';
 
@@ -25,6 +25,7 @@ import { AddTaskFormComponent } from './components/add-task-form/add-task-form.c
 import { TaskDetailsComponent } from './components/task-details/task-details.component';
 import { TaskHistoryComponent } from './components/task-history/task-history.component';
 import { TaskComponent } from './components/task/task.component';
+import { GroupUsageComponent } from './components/group-usage/group-usage.component';
 
 // Store reducers
 import { ActiveTaskReducer } from './store/reducers/active-task.reducers';
@@ -52,7 +53,8 @@ import { TaskHistoryEffects } from './store/effects/task-history.effects';
     AddTaskFormComponent,
     TaskDetailsComponent,
     TaskHistoryComponent,
-    TaskComponent
+    TaskComponent,
+    GroupUsageComponent
   ],
   imports: [
     BrowserModule,
@@ -60,10 +62,13 @@ import { TaskHistoryEffects } from './store/effects/task-history.effects';
     HttpModule,
     BrowserAnimationsModule,
     MaterialModule,
+    MdDatepickerModule,
+    MdNativeDateModule,
     RouterModule.forRoot([
       {path: 'groups', component: GroupsHomeComponent},
       {path: 'group/:id', component: GroupDetailsComponent},
       {path: 'task/:id', component: TaskDetailsComponent},
+      {path: 'usage/:id', component: GroupUsageComponent},
       {path: '**', redirectTo: 'groups'}
     ]),
     StoreModule.forRoot({

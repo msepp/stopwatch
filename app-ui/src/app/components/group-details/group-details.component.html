@@ -2,20 +2,35 @@
   <button md-icon-button color="primary" (click)="goBack()" title="Back"><md-icon>arrow_back</md-icon></button>
 </div>
 <div class="nameform">
+  <div class="mat-subheading-1 list-title">Change name</div>
   <form [formGroup]="groupForm" novalidate (submit)="saveGroup()">
     <md-input-container>
       <input mdInput placeholder="Group name" formControlName="name">
       <md-error>Name is required</md-error>
     </md-input-container>
-    <button md-icon-button title="Save"><md-icon>vertical_align_bottom</md-icon></button>
+    <button md-icon-button title="Save"><md-icon>save</md-icon></button>
   </form>
 </div>
-<div class="usage">
-  <pre *ngIf="usage">{{usage|json}}</pre>
-  <button md-raised-button (click)="getUsage()">fetch</button>
+<div class="usageform">
+  <div class="mat-subheading-1 list-title">Fetch usage report</div>
+  <form [formGroup]="usageForm" novalidate (submit)="getUsage()">
+    <md-input-container>
+      <input mdInput [mdDatepicker]="startDatepicker" placeholder="Start date" formControlName="start">
+      <button mdSuffix [mdDatepickerToggle]="startDatepicker"></button>
+      <md-error>Start date is required</md-error>
+    </md-input-container>
+    <md-datepicker #startDatepicker></md-datepicker>
+    <md-input-container>
+      <input mdInput [mdDatepicker]="endDatepicker" placeholder="End date" formControlName="end">
+      <button mdSuffix [mdDatepickerToggle]="endDatepicker"></button>
+      <md-error>End date is required</md-error>
+    </md-input-container>
+    <md-datepicker #endDatepicker></md-datepicker>
+    <button md-icon-button title="Fetch"><md-icon>receipt</md-icon></button>
+  </form>
 </div>
 <div class="listing">
-  <div class="mat-subheading-2 list-title">Tasks</div>
+  <div class="mat-subheading-1 list-title">Tasks</div>
   <div *ngIf="(tasks$|async)?.length == 0;then noTasks else showTasks"></div>
   <ng-template #showTasks>
     <md-list>

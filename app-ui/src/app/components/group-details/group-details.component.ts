@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -16,12 +17,14 @@ import { AppState, Group, Task } from '../../model';
 export class GroupDetailsComponent implements OnInit, OnDestroy {
   public tasks$: Store<Task[]>;
   public groupForm: FormGroup;
+  public usageForm: FormGroup;
   public group$: Subscription;
-  public usage: any;
+  public minDate = new Date(2017, 7, 1);
 
   constructor(
     private store: Store<AppState>,
     private location: Location,
+    private router: Router,
     private stopwatch: StopwatchService,
     private fb: FormBuilder,
     private err: ErrorService
@@ -33,11 +36,19 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
       name: ['', Validators.required]
     });
 
+    this.usageForm = this.fb.group({
+      id: [0],
+      start: ['', Validators.required],
+      end: ['', Validators.required]
+    });
+
     this.group$ = this.store.select('selectedGroup').subscribe((g: Group) => {
       this.groupForm.reset({
         id: g.id,
         name: g.name
       });
+
+      this.usageForm.get('id').setValue(g.id);
     });
 
     this.tasks$ = this.store.select('groupTasks');
@@ -52,14 +63,14 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
   }
 
   public getUsage() {
-    this.stopwatch.getUsage(
-      this.groupForm.get('id').value,
-      '2017-08-14',
-      '2017-08-21'
-    ).subscribe(
-      data => this.usage = data,
-      (e: Error) => this.err.log(e)
-    );
+    if (this.usageForm.valid) {
+      this.router.navigate(['/usage', this.usageForm.get('id').value], {
+        queryParams: {
+          start: this.usageForm.get('start').value,
+          end: this.usageForm.get('end').value
+        }
+      });
+    }
   }
 
   public saveGroup() {

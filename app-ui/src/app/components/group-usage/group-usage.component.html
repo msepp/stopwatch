@@ -1,0 +1,29 @@
+<div class="navigation">
+  <button md-icon-button color="primary" (click)="goBack()"><md-icon>arrow_back</md-icon></button>
+</div>
+<div *ngIf="group; then showTools else loadingTools"></div>
+<ng-template #showTools>
+  <div class="usageform">
+    <div class="mat-subheading-1 list-title">Fetch usage report</div>
+    <form [formGroup]="usageForm" novalidate (submit)="getUsage()">
+      <md-input-container>
+        <input mdInput [mdDatepicker]="startDatepicker" placeholder="Start date" formControlName="start">
+        <button mdSuffix [mdDatepickerToggle]="startDatepicker"></button>
+        <md-error>Start date is required</md-error>
+      </md-input-container>
+      <md-datepicker #startDatepicker></md-datepicker>
+      <md-input-container>
+        <input mdInput [mdDatepicker]="endDatepicker" placeholder="End date" formControlName="end">
+        <button mdSuffix [mdDatepickerToggle]="endDatepicker"></button>
+        <md-error>End date is required</md-error>
+      </md-input-container>
+      <md-datepicker #endDatepicker></md-datepicker>
+      <button md-icon-button title="Fetch"><md-icon>receipt</md-icon></button>
+    </form>
+  </div>
+  <div class="usagereport">
+  </div>
+</ng-template>
+<ng-template #loadingTools>
+  <md-spinner></md-spinner>
+</ng-template>
