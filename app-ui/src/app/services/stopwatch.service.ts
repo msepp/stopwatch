@@ -311,22 +311,14 @@ export class StopwatchService {
     return s.asObservable();
   }
 
-  public selectTask(tgt: Task): Observable<boolean> {
-    const s = new ReplaySubject<boolean>();
+  public selectTask(tgt: Task): Observable<Task> {
+    const s = new ReplaySubject<Task>();
 
-    this.store.select('groupTasks').take(1).subscribe(
-      (tasks: Task[]) => {
-        const task = tasks.find((v) => v.id === tgt.id);
-        if (!task) {
-          s.error(new Error('task not found'));
-          return;
-        }
-
-        console.log('setting selected task to', task);
+    this.backend.send(messaging.REQUEST_GET_TASK, tgt).subscribe(
+      (m: messaging.Message) => {
+        const task: Task = Object.assign(new Task, m.data);
         this.store.dispatch(new SelectedTaskActions.Set(task));
-
-        console.log('dispatching true to mark op ready');
-        s.next(true);
+        s.next(task);
       },
       e => s.error(e),
       () => s.complete()

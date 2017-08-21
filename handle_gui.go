@@ -32,6 +32,9 @@ func HandleGUIMessage(msg *message.Message) (interface{}, error) {
 	case message.RequestUpdateGroup:
 		return HandleUpdateGroup(msg)
 
+	case message.RequestGetTask:
+		return HandleGetTask(msg)
+
 	case message.RequestAddTask:
 		return HandleAddTask(msg)
 
@@ -133,6 +136,26 @@ func HandleGetGroups(msg *message.Message) (interface{}, error) {
 	}
 
 	return groups, nil
+}
+
+// HandleGetTask returns details of a single task
+func HandleGetTask(msg *message.Message) (interface{}, error) {
+	if gState.db == nil {
+		return nil, fmt.Errorf("no database")
+	}
+
+	var payload ReqPayloadGetTask
+	if err := msg.Into(&payload); err != nil || payload.TaskID <= 0 || payload.GroupID <= 0 {
+		return nil, fmt.Errorf("payload invalid or missing: %s", err)
+	}
+
+	// Retrieve task
+	task, err := gState.db.ReadTask(payload.GroupID, payload.TaskID)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to read task: %s", err)
+	}
+
+	return task, nil
 }
 
 // HandleGetActiveTask returns current active task or nil if not set.

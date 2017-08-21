@@ -43,6 +43,14 @@ type ReqPayloadSetTaskStatus struct {
 	TaskID int `json:"taskid" mapstructure:"id"`
 }
 
+// ReqPayloadGetTask defines data fields required for reading task details
+type ReqPayloadGetTask struct {
+	// GroupID of the target task. Required.
+	GroupID int `json:"groupid" mapstructure:"groupid"`
+	// TaskID of the target task. Required.
+	TaskID int `json:"taskid" mapstructure:"id"`
+}
+
 // ReqPayloadUpdateTask defines data fields required for updating task data
 type ReqPayloadUpdateTask struct {
 	// GroupID of the target task. Required.

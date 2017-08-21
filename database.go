@@ -351,6 +351,32 @@ func (db *StopwatchDB) ReadGroups() ([]Group, error) {
 	return res, nil
 }
 
+// ReadTask return a task
+func (db *StopwatchDB) ReadTask(group, task int) (*Task, error) {
+	if db.IsOpen() == false {
+		return nil, errors.New("database not ready")
+	}
+
+	var res Task
+
+	db.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucketTasks))
+		bg := b.Bucket(itob(group))
+		if bg == nil {
+			return errors.New("group not found")
+		}
+
+		buf := bg.Get(itob(task))
+		if buf == nil {
+			return errors.New("task not found")
+		}
+
+		return json.Unmarshal(buf, &res)
+	})
+
+	return &res, nil
+}
+
 // ReadTasks return all tasks for a group
 func (db *StopwatchDB) ReadTasks(group int) ([]*Task, error) {
 	if db.IsOpen() == false {
@@ -361,8 +387,12 @@ func (db *StopwatchDB) ReadTasks(group int) ([]*Task, error) {
 
 	db.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bucketTasks))
+		bg := b.Bucket(itob(group))
+		if bg == nil {
+			return errors.New("group not found")
+		}
 
-		return b.Bucket(itob(group)).ForEach(func(k []byte, v []byte) error {
+		return bg.ForEach(func(k []byte, v []byte) error {
 			var t Task
 			json.Unmarshal(v, &t)
 			res = append(res, &t)

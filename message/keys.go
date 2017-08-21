@@ -10,22 +10,23 @@ const (
 
 // Request keys
 const (
-	RequestWindowClose    = Key("window.close")
-	RequestWindowMinimize = Key("window.minimize")
+	RequestActiveTask     = Key("get.active.task")
 	RequestAppVersions    = Key("get.versions")
 	RequestOpenDatabase   = Key("open.database")
 	RequestAddTask        = Key("add.task")
 	RequestAddGroup       = Key("add.group")
-	RequestUpdateGroup    = Key("update.group")
-	RequestActiveTask     = Key("get.active.task")
+	RequestGetHistory     = Key("get.history")
+	RequestGetTask        = Key("get.task")
 	RequestGroups         = Key("get.groups")
 	RequestGroupTasks     = Key("get.group.tasks")
-	RequestUpdateTask     = Key("update.task")
+	RequestSetHistory     = Key("set.history")
 	RequestStartTask      = Key("start.task")
 	RequestStopTask       = Key("stop.task")
 	RequestTaskSlices     = Key("get.task.slices")
-	RequestGetHistory     = Key("get.history")
-	RequestSetHistory     = Key("set.history")
+	RequestUpdateGroup    = Key("update.group")
+	RequestUpdateTask     = Key("update.task")
+	RequestWindowClose    = Key("window.close")
+	RequestWindowMinimize = Key("window.minimize")
 )
 
 // Event keys
