@@ -38,6 +38,7 @@ import { TaskHistoryReducer } from './store/reducers/task-history.reducers';
 
 // Effects
 import { GroupTasksEffects } from './store/effects/group-tasks.effects';
+import { TaskHistoryEffects } from './store/effects/task-history.effects';
 
 @NgModule({
   declarations: [
@@ -76,7 +77,8 @@ import { GroupTasksEffects } from './store/effects/group-tasks.effects';
       taskHistory: TaskHistoryReducer
     }),
     EffectsModule.forRoot([
-      GroupTasksEffects
+      GroupTasksEffects,
+      TaskHistoryEffects
     ]),
     AstilectronModule
   ],

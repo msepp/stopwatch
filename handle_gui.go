@@ -44,6 +44,12 @@ func HandleGUIMessage(msg *message.Message) (interface{}, error) {
 	case message.RequestStopTask:
 		return HandleStopTask(msg)
 
+	case message.RequestGetHistory:
+		return HandleGetHistory(msg)
+
+	case message.RequestSetHistory:
+		return HandleSetHistory(msg)
+
 	default:
 		return nil, fmt.Errorf("Unrecognized GUI message key: %s", msg.Key)
 	}
@@ -74,6 +80,41 @@ func HandleOpenDatabase(msg *message.Message) (interface{}, error) {
 	if err := gState.db.Open(path.Join(rootdir, "data.dat")); err != nil {
 		gState.db = nil
 		return nil, fmt.Errorf("failed to open database: %s", err)
+	}
+
+	return nil, nil
+}
+
+// HandleGetHistory returns task history
+func HandleGetHistory(msg *message.Message) (interface{}, error) {
+	if gState.db == nil {
+		return nil, fmt.Errorf("no database")
+	}
+
+	// Retrieve task usage
+	history, err := gState.db.ReadHistory()
+	if err != nil {
+		return nil, fmt.Errorf("Unable to read history: %s", err)
+	}
+
+	return history, nil
+}
+
+// HandleSetHistory saves history information
+func HandleSetHistory(msg *message.Message) (interface{}, error) {
+	if gState.db == nil {
+		return nil, fmt.Errorf("no database")
+	}
+
+	var payload ReqPayloadSetHistory
+	if err := msg.Into(&payload); err != nil {
+		return nil, fmt.Errorf("payload invalid or missing: %s", err)
+	}
+
+	// Save history items
+	err := gState.db.SaveHistory(payload.History)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to save history: %s", err)
 	}
 
 	return nil, nil

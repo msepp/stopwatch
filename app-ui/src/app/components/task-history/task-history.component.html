@@ -2,7 +2,7 @@
 <div *ngIf="(tasks|async)?.length == 0; then noTasks else showHistory"></div>
 <ng-template #showHistory>
   <md-list>
-    <app-task *ngFor="let task of tasks|async" [task]="task"></app-task>
+    <app-task *ngFor="let task of tasks|async; trackBy: taskTrackBy" [task]="task"></app-task>
   </md-list>
 </ng-template>
 <ng-template #noTasks>

@@ -24,6 +24,8 @@ const (
 	RequestStartTask      = Key("start.task")
 	RequestStopTask       = Key("stop.task")
 	RequestTaskSlices     = Key("get.task.slices")
+	RequestGetHistory     = Key("get.history")
+	RequestSetHistory     = Key("set.history")
 )
 
 // Event keys

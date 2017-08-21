@@ -14,10 +14,11 @@ import (
 
 // bucket names
 const (
-	bucketTasks  = "tasks"
-	bucketGroups = "groups"
-	bucketState  = "state"
-	bucketSlices = "slices"
+	bucketTasks   = "tasks"
+	bucketGroups  = "groups"
+	bucketState   = "state"
+	bucketSlices  = "slices"
+	bucketHistory = "history"
 )
 
 // StopwatchDB is a handle for accessing a stopwatch database
@@ -372,6 +373,60 @@ func (db *StopwatchDB) ReadTasks(group int) ([]*Task, error) {
 	return res, nil
 }
 
+// SaveHistory updates task history to given value
+func (db *StopwatchDB) SaveHistory(history []HistoryTask) error {
+	if db.IsOpen() == false {
+		return errors.New("database not ready")
+	}
+
+	return db.db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucketHistory))
+		buf, err := json.Marshal(history)
+		if err != nil {
+			return err
+		}
+
+		log.Printf("writing usage: %s", string(buf))
+		return b.Put([]byte("usage"), buf)
+	})
+}
+
+// ReadHistory returns last known task usage history
+func (db *StopwatchDB) ReadHistory() ([]Task, error) {
+	if db.IsOpen() == false {
+		return nil, errors.New("database not ready")
+	}
+
+	var history []HistoryTask
+	err := db.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(bucketHistory))
+		buf := b.Get([]byte("usage"))
+		log.Printf("read usage: %s", string(buf))
+		if buf != nil {
+			return json.Unmarshal(buf, &history)
+		}
+
+		// No history yet
+		history = []HistoryTask{}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Retrieve tasks for history entries
+	res := []Task{}
+	for _, ht := range history {
+		t, err := db.GetTask(ht.GroupID, ht.ID)
+		if err == nil {
+			res = append(res, *t)
+		}
+	}
+
+	return res, nil
+}
+
 // Open opens a database and initializes it
 func (db *StopwatchDB) Open(path string) error {
 	var err error
@@ -386,48 +441,25 @@ func (db *StopwatchDB) Open(path string) error {
 		return err
 	}
 
-	if err = db.db.Update(func(tx *bolt.Tx) error {
-		_, err = tx.CreateBucketIfNotExists([]byte(bucketState))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
-		}
-		return nil
-
-	}); err != nil {
-		return err
+	buckets := []string{
+		bucketState,
+		bucketTasks,
+		bucketSlices,
+		bucketGroups,
+		bucketHistory,
 	}
 
-	if err = db.db.Update(func(tx *bolt.Tx) error {
-		_, err = tx.CreateBucketIfNotExists([]byte(bucketTasks))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
+	for _, bucket := range buckets {
+		if err = db.db.Update(func(tx *bolt.Tx) error {
+			_, err = tx.CreateBucketIfNotExists([]byte(bucket))
+			if err != nil {
+				return fmt.Errorf("create bucket '%s' failed: %s", bucket, err)
+			}
+			return nil
+
+		}); err != nil {
+			return err
 		}
-		return nil
-
-	}); err != nil {
-		return err
-	}
-
-	if err = db.db.Update(func(tx *bolt.Tx) error {
-		_, err = tx.CreateBucketIfNotExists([]byte(bucketSlices))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
-		}
-		return nil
-
-	}); err != nil {
-		return err
-	}
-
-	if err = db.db.Update(func(tx *bolt.Tx) error {
-		_, err = tx.CreateBucketIfNotExists([]byte(bucketGroups))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
-		}
-		return nil
-
-	}); err != nil {
-		return err
 	}
 
 	return nil

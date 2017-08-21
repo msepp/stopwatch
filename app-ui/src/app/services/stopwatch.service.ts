@@ -7,6 +7,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 
 import { Store } from '@ngrx/store';
+import { ErrorService } from './error.service';
 import { AppState, Group, Task } from '../model';
 import * as ActiveTaskActions from '../store/actions/active-task.actions';
 import * as BackendConnActions from '../store/actions/backend-conn.actions';
@@ -25,12 +26,26 @@ export class StopwatchService {
 
   constructor(
     private backend: Astilectron,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private err: ErrorService
   ) {
     this._dbopen$ = new BehaviorSubject<boolean>(false);
 
     this.store.select('selectedGroup').subscribe(g => this._selectedGroup = g);
     this.store.select('activeTask').subscribe(t => this._activeTask = t);
+
+    // Save history when it has content. Skip first (initial value) and the
+    // first loaded value (don't want to re-save it.)
+    this.store.select('taskHistory')
+      .skip(2)
+      .filter((list: Task[]) => list.length > 0)
+      .debounceTime(1000)
+      .subscribe(
+        (history: Task[]) => this.saveTaskHistory(history).subscribe(
+          () => {console.log('saved history:', history); },
+          (e: Error) => this.err.log(e)
+        )
+      );
   }
 
   public get ready(): Observable<boolean> {
@@ -140,6 +155,41 @@ export class StopwatchService {
     return s.asObservable();
   }
 
+  public loadTaskHistory(): Observable<Task[]> {
+    const s = new Subject<Group>();
+
+    this.backend.send(messaging.REQUEST_GET_TASK_HISTORY, null).subscribe(
+      (m: messaging.Message) => {
+        console.log('loaded task history:', m.data);
+        const tasks: Task[] = [];
+        m.data.forEach(t => tasks.push(Object.assign(new Task, t)));
+
+        this.store.dispatch(new TaskHistoryActions.Set(tasks));
+        s.next(tasks);
+      },
+      (e: Error) => s.error(e),
+      () => s.complete()
+    );
+
+    return s.asObservable();
+  }
+
+  public saveTaskHistory(history: Task[]): Observable<boolean> {
+    const s = new Subject<Group>();
+
+    console.log('saving history:', history);
+    this.backend.send(messaging.REQUEST_SET_TASK_HISTORY, {history}).subscribe(
+      (m: messaging.Message) => {
+        console.log('updated task history');
+        s.next(true);
+      },
+      (e: Error) => s.error(e),
+      () => s.complete()
+    );
+
+    return s.asObservable();
+  }
+
   public loadActiveTask(): Observable<Task> {
     const s = new Subject<Group>();
 
@@ -210,7 +260,7 @@ export class StopwatchService {
           // Wait until activeTask isn't set.
           this.store.select('activeTask').filter(v => v === null).take(1).subscribe(() => {
             this.startTask(task).subscribe(
-              (t) => s.next(t),
+              (t: Task) => s.next(t),
               (e: Error) => s.error(e),
               () => s.complete()
             );
@@ -251,8 +301,7 @@ export class StopwatchService {
         }
 
         this.store.dispatch(new GroupTasksActions.Update(newTask));
-        this.store.dispatch(new TaskHistoryActions.Push(newTask));
-
+        this.store.dispatch(new TaskHistoryActions.Add(newTask));
         s.next(newTask);
       },
       (e: Error) => s.error(e),

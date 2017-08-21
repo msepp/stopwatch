@@ -9,7 +9,7 @@ import * as TaskHistoryActions from '../actions/task-history.actions';
 
 @Injectable()
 export class GroupTasksEffects {
-  // Listen for the 'LOGIN' action
+  // Listen for the 'UPDATE_TASK' action
   @Effect() update$ = this.actions$.ofType(GroupTasksActions.UPDATE_TASK)
     // Map the payload into JSON to use as the request body
     .flatMap((a: GroupTasksActions.Update) => [

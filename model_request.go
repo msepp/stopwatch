@@ -20,6 +20,11 @@ type ReqPayloadGetGroupTasks struct {
 	GroupID int `json:"id" mapstructure:"id"`
 }
 
+// ReqPayloadSetHistory is the payload for updating task usage history
+type ReqPayloadSetHistory struct {
+	History []HistoryTask `json:"history" mapstructure:"history"`
+}
+
 // ReqPayloadAddTask defines data fields available when adding a task
 type ReqPayloadAddTask struct {
 	// CostCode for the task

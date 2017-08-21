@@ -32,6 +32,7 @@ export class AppComponent implements OnInit {
     this.store.select('backendConn')
       .filter(ok => (ok === true))
       .take(1)
+      .concatMap(() => this.stopwatch.loadTaskHistory())
       .concatMap(() => this.stopwatch.loadGroups())
       .concatMap(() => this.stopwatch.loadActiveTask())
       .subscribe(

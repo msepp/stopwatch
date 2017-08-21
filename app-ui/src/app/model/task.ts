@@ -8,3 +8,7 @@ export class Task {
     public running?: string
   ) {}
 }
+
+export function taskMatch(a: Task, b: Task): boolean {
+  return a.id === b.id && a.groupid === b.groupid;
+}

@@ -15,10 +15,15 @@ export class TaskHistoryComponent implements OnInit {
     private store: Store<AppState>
   ) {
     this.tasks = this.store.select('taskHistory').map((tasks: Task[]) => {
+      console.log('history updated');
       return tasks.slice(0, 5);
     });
   }
 
   ngOnInit() {
+  }
+
+  public taskTrackBy(index: number, task: Task): string {
+    return task.id + '-' + task.groupid;
   }
 }
