@@ -17,6 +17,7 @@ export const REQUEST_UPDATE_TASK     = 'update.task';
 export const REQUEST_OPEN_DATABASE   = 'open.database';
 export const REQUEST_GET_TASK_HISTORY = 'get.history';
 export const REQUEST_SET_TASK_HISTORY = 'set.history';
+
 // Event keys
 export const EVENT_BACKEND_STATUS = 'backend.status';
 
