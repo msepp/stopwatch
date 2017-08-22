@@ -8,10 +8,11 @@ Uses [go-astilectron](https://github.com/asticode/go-astilectron) for Golang/Ele
  * Add tasks, grouped into named groups.
  * Start & Stop timer per task.
  * Edit groups & task details.
+ * Get a table of time used per cost code for a group.
 
 ## TODO
- * Generate reports of time spent from selected time periods
  * Editing of recorded time to fix mishaps (eg. forgot to stop task).
+  * Already in the CLI.
 
 ## Screenshot
 
