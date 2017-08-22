@@ -17,9 +17,11 @@ Uses [go-astilectron](https://github.com/asticode/go-astilectron) for Golang/Ele
  * Editing of recorded time to fix mishaps (eg. forgot to stop task).
    * Already in the CLI (see dumper).
 
-## Screenshot
+## Screenshots
 
-![Group view](https://raw.githubusercontent.com/msepp/stopwatch/master/screenshot.png "Group view screenshot")
+![Group view](https://raw.githubusercontent.com/msepp/stopwatch/master/screenshot-main.png "Main view screenshot")
+![Group view](https://raw.githubusercontent.com/msepp/stopwatch/master/screenshot-group.png "Group view screenshot")
+![Group view](https://raw.githubusercontent.com/msepp/stopwatch/master/screenshot-report.png "Report view screenshot")
 
 ## Requirements
 
