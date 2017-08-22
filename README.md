@@ -10,8 +10,10 @@ Uses [go-astilectron](https://github.com/asticode/go-astilectron) for Golang/Ele
  * History of last used tasks for easy switching.
  * Edit groups & task details.
  * Get a table of time used per cost code for a group.
+ * Ability to choose database to work with (cli option)
 
 ## TODO
+ * Deletion of tasks & groups
  * Editing of recorded time to fix mishaps (eg. forgot to stop task).
   * Already in the CLI.
 
