@@ -15,7 +15,7 @@ Uses [go-astilectron](https://github.com/asticode/go-astilectron) for Golang/Ele
 ## TODO
  * Deletion of tasks & groups
  * Editing of recorded time to fix mishaps (eg. forgot to stop task).
-  * Already in the CLI.
+   * Already in the CLI (see dumper).
 
 ## Screenshot
 
