@@ -121,16 +121,16 @@ COMMON_DEPS := Makefile \
                stopwatchapp/*.go
 
 # Linker flags for setting version info for config during build.
-LDFLAGS := -X '${ROOT_PKG}/bootstrap.electronVersion=${ELECTRON_VERSION}' \
-           -X '${ROOT_PKG}/bootstrap.astilectronVersion=${ASTILECTRON_VERSION}' \
-           -X '${ROOT_PKG}/bootstrap.appVersion=${APP_VERSION}' \
-           -X '${ROOT_PKG}/bootstrap.resourcesDir=${RESOURCES_DIR}' \
-           -X '${ROOT_PKG}/bootstrap.devTools=${ENABLE_DEV_TOOLS}' \
-           -X '${ROOT_PKG}/bootstrap.useTemp=${USE_TEMP}' \
-           -X '${ROOT_PKG}/bootstrap.build=""${BUILD_STRING}""' \
-           -X '${ROOT_PKG}/bootstrap.guiName=""${UI_SRC_PROJECT}""' \
-           -X '${ROOT_PKG}/bootstrap.name=""${APP_NAME}""' \
-           -X '${ROOT_PKG}/bootstrap.prefix=""${APP_PREFIX}""'
+LDFLAGS := -X '${ROOT_PKG}/stopwatchapp.electronVersion=${ELECTRON_VERSION}' \
+           -X '${ROOT_PKG}/stopwatchapp.astilectronVersion=${ASTILECTRON_VERSION}' \
+           -X '${ROOT_PKG}/stopwatchapp.appVersion=${APP_VERSION}' \
+           -X '${ROOT_PKG}/stopwatchapp.resourcesDir=${RESOURCES_DIR}' \
+           -X '${ROOT_PKG}/stopwatchapp.devTools=${ENABLE_DEV_TOOLS}' \
+           -X '${ROOT_PKG}/stopwatchapp.useTemp=${USE_TEMP}' \
+           -X '${ROOT_PKG}/stopwatchapp.build=""${BUILD_STRING}""' \
+           -X '${ROOT_PKG}/stopwatchapp.guiName=""${UI_SRC_PROJECT}""' \
+           -X '${ROOT_PKG}/stopwatchapp.name=""${APP_NAME}""' \
+           -X '${ROOT_PKG}/stopwatchapp.prefix=""${APP_PREFIX}""'
 
 DEFAULT_TARGET := ${APP_FILENAME}
 ifeq ($(OS),Windows_NT)
