@@ -8,6 +8,8 @@
 
 .header {
   flex: 0 0 auto;
+  position: fixed;
+  width: 100%;
 }
 
 .content {
@@ -16,6 +18,9 @@
   padding: 0;
   flex-direction: column;
   box-sizing: border-box;
+  overflow: auto;
+  margin-top: 85px;
+  max-height: ~"calc(100vh - 85px)";
 }
 
 .loader {

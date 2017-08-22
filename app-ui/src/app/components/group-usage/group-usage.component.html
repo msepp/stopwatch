@@ -5,7 +5,7 @@
 <div *ngIf="usage; then showUsage else loadingUsage"></div>
 <ng-template #showTools>
   <div class="usageform">
-    <div class="mat-subheading-1 list-title">Fetch usage report</div>
+    <div class="mat-subheading-2 list-title">Time used on {{group.Name}}</div>
     <form [formGroup]="usageForm" novalidate (submit)="getUsage()">
       <md-input-container>
         <input mdInput [mdDatepicker]="startDatepicker" placeholder="Start date" formControlName="start">
@@ -31,7 +31,7 @@
     <table>
       <thead>
         <tr>
-          <th class="id">Task</th>
+          <th class="id">Cost code</th>
           <th *ngFor="let date of usage.Dates">{{date.Date|date:'d.M.'}}</th>
           <th class="total">Total</th>
         </tr>

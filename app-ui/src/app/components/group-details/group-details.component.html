@@ -2,7 +2,7 @@
   <button md-icon-button color="primary" (click)="goBack()" title="Back"><md-icon>arrow_back</md-icon></button>
 </div>
 <div class="nameform">
-  <div class="mat-subheading-1 list-title">Change name</div>
+  <div class="mat-subheading-2 list-title">Change name</div>
   <form [formGroup]="groupForm" novalidate (submit)="saveGroup()">
     <md-input-container>
       <input mdInput placeholder="Group name" formControlName="name">
@@ -12,7 +12,7 @@
   </form>
 </div>
 <div class="usageform">
-  <div class="mat-subheading-1 list-title">Fetch usage report</div>
+  <div class="mat-subheading-2 list-title">Fetch usage report</div>
   <form [formGroup]="usageForm" novalidate (submit)="getUsage()">
     <md-input-container>
       <input mdInput [mdDatepicker]="startDatepicker" placeholder="Start date" formControlName="start">
@@ -30,7 +30,7 @@
   </form>
 </div>
 <div class="listing">
-  <div class="mat-subheading-1 list-title">Tasks</div>
+  <div class="mat-subheading-2 list-title">Tasks</div>
   <div *ngIf="(tasks$|async)?.length == 0;then noTasks else showTasks"></div>
   <ng-template #showTasks>
     <md-list>

@@ -38,7 +38,8 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
 
     const end: Date = new Date();
     const start = new Date(end.getTime());
-    start.setDate(start.getDate() - 5);
+    // Set start to current weeks monday
+    start.setDate(start.getDate() - (start.getDay() - 1));
 
     this.usageForm = this.fb.group({
       id: [0],

@@ -4,7 +4,7 @@
   <md-list>
     <md-list-item *ngFor="let group of groups|async">
       <md-icon md-list-icon>work</md-icon>
-      <h4 md-line>{{group.name}}</h4>
+      <h4 class="group-name" md-line (click)="goTo(group)">{{group.name}}</h4>
       <button md-icon-button color="primary" (click)="goTo(group)" title="View group"><md-icon>arrow_forward</md-icon></button>
     </md-list-item>
   </md-list>
