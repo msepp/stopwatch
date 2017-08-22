@@ -6,8 +6,8 @@ import (
 	"path"
 	"time"
 
-	"github.com/msepp/stopwatch/bootstrap"
 	"github.com/msepp/stopwatch/message"
+	app "github.com/msepp/stopwatch/stopwatchapp"
 	"github.com/msepp/stopwatch/stopwatchdb"
 )
 
@@ -68,10 +68,10 @@ func HandleGUIMessage(msg *message.Message) (interface{}, error) {
 // HandleGetAppVersions returns versions used in the updater
 func HandleGetAppVersions(msg *message.Message) (interface{}, error) {
 	return map[string]string{
-		"app":         bootstrap.Version(),
-		"build":       bootstrap.Build(),
-		"electron":    bootstrap.ElectronVersion(),
-		"astilectron": bootstrap.AstilectronVersion(),
+		"app":         app.Version(),
+		"build":       app.Build(),
+		"electron":    app.ElectronVersion(),
+		"astilectron": app.AstilectronVersion(),
 	}, nil
 }
 
@@ -82,7 +82,7 @@ func HandleOpenDatabase(msg *message.Message) (interface{}, error) {
 		gState.db = stopwatchdb.New()
 	}
 
-	rootdir, err := bootstrap.PersistentDataDir()
+	rootdir, err := app.PersistentDataDir()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create database dir: %s", err)
 	}

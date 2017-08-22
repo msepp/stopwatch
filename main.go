@@ -6,20 +6,20 @@ package main
 import (
 	"log"
 
-	"github.com/msepp/stopwatch/bootstrap"
+	app "github.com/msepp/stopwatch/stopwatchapp"
 	"github.com/msepp/stopwatch/stopwatchdb"
 )
 
 // Various handles that are used globally
 var gState = struct {
-	app *bootstrap.App
+	app *app.App
 	db  *stopwatchdb.StopwatchDB
 }{}
 
 func main() {
 
 	// Init new application
-	gState.app = bootstrap.New(Asset, RestoreAsset, HandleGUIMessage)
+	gState.app = app.New(Asset, RestoreAsset, HandleGUIMessage)
 
 	// Bootstrap to get things going
 	if err := gState.app.Bootstrap(); err != nil {

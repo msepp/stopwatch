@@ -1,4 +1,4 @@
-package bootstrap
+package stopwatchapp
 
 import (
 	astilectron "github.com/asticode/go-astilectron"
