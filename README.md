@@ -7,6 +7,7 @@ Uses [go-astilectron](https://github.com/asticode/go-astilectron) for Golang/Ele
 ## Features
  * Add tasks, grouped into named groups.
  * Start & Stop timer per task.
+ * History of last used tasks for easy switching.
  * Edit groups & task details.
  * Get a table of time used per cost code for a group.
 
