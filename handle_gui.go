@@ -81,12 +81,16 @@ func HandleOpenDatabase(msg *app.Message) (interface{}, error) {
 		gState.db = stopwatchdb.New()
 	}
 
-	rootdir, err := app.PersistentDataDir()
-	if err != nil {
-		return nil, fmt.Errorf("failed to create database dir: %s", err)
+	if gState.databasePath == "" {
+		rootdir, err := app.PersistentDataDir()
+		if err != nil {
+			return nil, fmt.Errorf("failed to create database dir: %s", err)
+		}
+
+		gState.databasePath = path.Join(rootdir, "data.dat")
 	}
 
-	if err := gState.db.Open(path.Join(rootdir, "data.dat")); err != nil {
+	if err := gState.db.Open(gState.databasePath); err != nil {
 		gState.db = nil
 		return nil, fmt.Errorf("failed to open database: %s", err)
 	}

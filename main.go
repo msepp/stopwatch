@@ -4,6 +4,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	app "github.com/msepp/stopwatch/stopwatchapp"
@@ -12,11 +13,15 @@ import (
 
 // Various handles that are used globally
 var gState = struct {
-	app *app.App
-	db  *stopwatchdb.StopwatchDB
+	app          *app.App
+	db           *stopwatchdb.StopwatchDB
+	databasePath string
 }{}
 
 func main() {
+	flag.StringVar(&gState.databasePath, "db", "", "database path. If none given, a database is created under users home.")
+	flag.Parse()
+
 	// Init new application
 	gState.app = app.New(Asset, RestoreAsset, HandleGUIMessage)
 
