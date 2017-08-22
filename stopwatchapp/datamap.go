@@ -1,4 +1,4 @@
-package message
+package stopwatchapp
 
 // DataMap is an helper for interacting with map type message data
 type DataMap map[string]interface{}

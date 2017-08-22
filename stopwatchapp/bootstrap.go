@@ -5,7 +5,6 @@ import (
 	"path"
 
 	astilectron "github.com/asticode/go-astilectron"
-	"github.com/msepp/stopwatch/message"
 )
 
 // Bootstrap unpacks required assets and creates the application GUI window
@@ -87,7 +86,7 @@ func (a *App) Bootstrap() error {
 	}
 
 	// Setup queue for message sending
-	a.msgQueue = make(chan message.Message, 50)
+	a.msgQueue = make(chan Message, 50)
 
 	// Run routine for handling sending
 	go a.messageQueueFlusher()

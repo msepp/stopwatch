@@ -1,4 +1,4 @@
-package model
+package stopwatchmodel
 
 // Group defines a single group
 type Group struct {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/msepp/stopwatch/model"
+	model "github.com/msepp/stopwatch/stopwatchmodel"
 )
 
 // ReqPayloadAddGroup defines data fields available when adding a group

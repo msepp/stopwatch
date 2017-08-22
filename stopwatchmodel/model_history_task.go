@@ -1,4 +1,4 @@
-package model
+package stopwatchmodel
 
 // HistoryTask is a task entry in task history
 type HistoryTask struct {

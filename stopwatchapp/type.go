@@ -1,4 +1,4 @@
-package message
+package stopwatchapp
 
 // Type tells the type of the message, if it's a response, error or an event
 type Type string

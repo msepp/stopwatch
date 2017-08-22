@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	astilectron "github.com/asticode/go-astilectron"
-	"github.com/msepp/stopwatch/message"
 )
 
 // App defines an GUI application and the required component handles
@@ -15,7 +14,7 @@ type App struct {
 	assetDir     string                   // Path to unpacked assets
 	assetData    astilectron.Disembedder  // Function for reading embedded data
 	assetRestore AssetRestoreFn           // function for unpacking embedded data
-	msgQueue     chan message.Message     // Queue for outbound GUI messages
+	msgQueue     chan Message             // Queue for outbound GUI messages
 	msgHandler   MessageHandlerFn         // Handle function for incoming GUI messages
 	opRunning    bool                     // True if performing something that blocks other similar requests
 	lock         sync.RWMutex

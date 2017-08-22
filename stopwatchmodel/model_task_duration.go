@@ -1,4 +1,4 @@
-package model
+package stopwatchmodel
 
 import (
 	"encoding/json"

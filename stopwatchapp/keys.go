@@ -1,4 +1,4 @@
-package message
+package stopwatchapp
 
 // Key is a message key, which tells what the message purpose is.
 type Key string

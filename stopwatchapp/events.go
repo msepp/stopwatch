@@ -2,11 +2,10 @@ package stopwatchapp
 
 import (
 	astilectron "github.com/asticode/go-astilectron"
-	"github.com/msepp/stopwatch/message"
 )
 
 // MessageHandlerFn defines an callback for incoming GUI messages
-type MessageHandlerFn func(*message.Message) (interface{}, error)
+type MessageHandlerFn func(*Message) (interface{}, error)
 
 // OnWindowMessage creates a handler for incoming EventNameWindowEventMessage
 // events.
@@ -14,11 +13,11 @@ func (a *App) onWindowMessage() func(astilectron.Event) bool {
 	return func(e astilectron.Event) (deleteListener bool) {
 		var err error
 		var res interface{}
-		var req message.Message
-		var resp *message.Message
+		var req Message
+		var resp *Message
 
 		if err = e.Message.Unmarshal(&req); err != nil {
-			resp = message.NewError(req.ID, err.Error())
+			resp = NewError(req.ID, err.Error())
 			a.msgQueue <- *resp
 			return
 		}
@@ -27,7 +26,7 @@ func (a *App) onWindowMessage() func(astilectron.Event) bool {
 		// We pass these on for handling elsewhere. For one reason or another,
 		// eg. w.Minimize() will never return here, maybe something to do with
 		// the context we're in.
-		case message.RequestWindowClose, message.RequestWindowMinimize:
+		case RequestWindowClose, RequestWindowMinimize:
 			res = "ok"
 
 		default:
@@ -36,9 +35,9 @@ func (a *App) onWindowMessage() func(astilectron.Event) bool {
 
 		// Generate response Message, use Error type if erros were found
 		if err != nil {
-			resp = message.NewError(req.ID, err.Error())
+			resp = NewError(req.ID, err.Error())
 		} else {
-			resp = message.NewResponse(req.ID, req.Key, res)
+			resp = NewResponse(req.ID, req.Key, res)
 		}
 
 		// Queue response

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/msepp/stopwatch/model"
+	model "github.com/msepp/stopwatch/stopwatchmodel"
 )
 
 // Bucket names

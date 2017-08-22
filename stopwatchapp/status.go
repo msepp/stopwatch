@@ -1,4 +1,4 @@
-package message
+package stopwatchapp
 
 // Backend status strings
 const (
@@ -13,7 +13,7 @@ type BackendStatus struct {
 
 // NewBackendStatus generates an new backend status event message
 func NewBackendStatus(status string) *Message {
-	return New("", Event, EventBackendStatusChanged, &BackendStatus{
+	return NewMessage("", Event, EventBackendStatusChanged, &BackendStatus{
 		Status: status,
 	})
 }

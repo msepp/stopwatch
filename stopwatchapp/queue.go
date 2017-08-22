@@ -2,12 +2,10 @@ package stopwatchapp
 
 import (
 	"log"
-
-	"github.com/msepp/stopwatch/message"
 )
 
 // Send sends an message into queue for delivery to renderer.
-func (a *App) Send(m *message.Message) {
+func (a *App) Send(m *Message) {
 	a.msgQueue <- *m
 }
 
@@ -21,11 +19,11 @@ func (a *App) messageQueueFlusher() {
 				return
 			}
 
-			if m.Key == message.RequestWindowClose {
+			if m.Key == RequestWindowClose {
 				a.Window.Close()
 				a.Renderer.Stop()
 
-			} else if m.Key == message.RequestWindowMinimize {
+			} else if m.Key == RequestWindowMinimize {
 				if err := a.Window.Minimize(); err != nil {
 					log.Printf("Error minimizing window: %s", err)
 				}

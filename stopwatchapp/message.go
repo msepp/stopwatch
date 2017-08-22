@@ -1,8 +1,4 @@
-// Package message implements message types for IPC between GUI and backend.
-//
-// All int conversions assume original datatype is float64 because that's the
-// type used when receiving data from Electron (JavaScript Number is a float).
-package message
+package stopwatchapp
 
 import (
 	"fmt"
@@ -31,8 +27,8 @@ func (m Message) String() string {
 	}
 }
 
-// New returns an Message with given values
-func New(id string, t Type, key Key, data interface{}) *Message {
+// NewMessage returns an Message with given values
+func NewMessage(id string, t Type, key Key, data interface{}) *Message {
 	return &Message{
 		ID:   id,
 		Key:  key,
@@ -43,22 +39,22 @@ func New(id string, t Type, key Key, data interface{}) *Message {
 
 // NewEvent returns an event message with given data.
 func NewEvent(event Key, data interface{}) *Message {
-	return New("", Event, event, data)
+	return NewMessage("", Event, event, data)
 }
 
 // NewResponse returns an response message with given data.
 func NewResponse(id string, key Key, data interface{}) *Message {
-	return New(id, Response, key, data)
+	return NewMessage(id, Response, key, data)
 }
 
 // NewError returns an error message.
 func NewError(id string, err string) *Message {
-	return New(id, Error, ErrorOperationFailed, err)
+	return NewMessage(id, Error, ErrorOperationFailed, err)
 }
 
 // NewAlert returns an alert message with given data
 func NewAlert(data interface{}) *Message {
-	return New("", Alert, "", data)
+	return NewMessage("", Alert, "", data)
 }
 
 // DataString returns the data as string if possible and if the value was a string.

@@ -6,58 +6,57 @@ import (
 	"path"
 	"time"
 
-	"github.com/msepp/stopwatch/message"
 	app "github.com/msepp/stopwatch/stopwatchapp"
 	"github.com/msepp/stopwatch/stopwatchdb"
 )
 
 // HandleGUIMessage is called when we receive messages from the user interface.
-func HandleGUIMessage(msg *message.Message) (interface{}, error) {
+func HandleGUIMessage(msg *app.Message) (interface{}, error) {
 	switch msg.Key {
 
-	case message.RequestActiveTask:
+	case app.RequestActiveTask:
 		return HandleGetActiveTask(msg)
 
-	case message.RequestAddGroup:
+	case app.RequestAddGroup:
 		return HandleAddGroup(msg)
 
-	case message.RequestAddTask:
+	case app.RequestAddTask:
 		return HandleAddTask(msg)
 
-	case message.RequestAppVersions:
+	case app.RequestAppVersions:
 		return HandleGetAppVersions(msg)
 
-	case message.RequestGetHistory:
+	case app.RequestGetHistory:
 		return HandleGetHistory(msg)
 
-	case message.RequestGroups:
+	case app.RequestGroups:
 		return HandleGetGroups(msg)
 
-	case message.RequestGroupTasks:
+	case app.RequestGroupTasks:
 		return HandleGetGroupTasks(msg)
 
-	case message.RequestGetTask:
+	case app.RequestGetTask:
 		return HandleGetTask(msg)
 
-	case message.RequestGetUsage:
+	case app.RequestGetUsage:
 		return HandleGetUsage(msg)
 
-	case message.RequestOpenDatabase:
+	case app.RequestOpenDatabase:
 		return HandleOpenDatabase(msg)
 
-	case message.RequestSetHistory:
+	case app.RequestSetHistory:
 		return HandleSetHistory(msg)
 
-	case message.RequestStartTask:
+	case app.RequestStartTask:
 		return HandleStartTask(msg)
 
-	case message.RequestStopTask:
+	case app.RequestStopTask:
 		return HandleStopTask(msg)
 
-	case message.RequestUpdateGroup:
+	case app.RequestUpdateGroup:
 		return HandleUpdateGroup(msg)
 
-	case message.RequestUpdateTask:
+	case app.RequestUpdateTask:
 		return HandleUpdateTask(msg)
 
 	default:
@@ -66,7 +65,7 @@ func HandleGUIMessage(msg *message.Message) (interface{}, error) {
 }
 
 // HandleGetAppVersions returns versions used in the updater
-func HandleGetAppVersions(msg *message.Message) (interface{}, error) {
+func HandleGetAppVersions(msg *app.Message) (interface{}, error) {
 	return map[string]string{
 		"app":         app.Version(),
 		"build":       app.Build(),
@@ -77,7 +76,7 @@ func HandleGetAppVersions(msg *message.Message) (interface{}, error) {
 
 // HandleOpenDatabase attempts to open database. Returns if the operation
 // succeeded.
-func HandleOpenDatabase(msg *message.Message) (interface{}, error) {
+func HandleOpenDatabase(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		gState.db = stopwatchdb.New()
 	}
@@ -96,7 +95,7 @@ func HandleOpenDatabase(msg *message.Message) (interface{}, error) {
 }
 
 // HandleGetHistory returns task history
-func HandleGetHistory(msg *message.Message) (interface{}, error) {
+func HandleGetHistory(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -111,7 +110,7 @@ func HandleGetHistory(msg *message.Message) (interface{}, error) {
 }
 
 // HandleSetHistory saves history information
-func HandleSetHistory(msg *message.Message) (interface{}, error) {
+func HandleSetHistory(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -131,7 +130,7 @@ func HandleSetHistory(msg *message.Message) (interface{}, error) {
 }
 
 // HandleGetGroups returns all known groups
-func HandleGetGroups(msg *message.Message) (interface{}, error) {
+func HandleGetGroups(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -146,7 +145,7 @@ func HandleGetGroups(msg *message.Message) (interface{}, error) {
 }
 
 // HandleGetTask returns details of a single task
-func HandleGetTask(msg *message.Message) (interface{}, error) {
+func HandleGetTask(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -166,7 +165,7 @@ func HandleGetTask(msg *message.Message) (interface{}, error) {
 }
 
 // HandleGetActiveTask returns current active task or nil if not set.
-func HandleGetActiveTask(msg *message.Message) (interface{}, error) {
+func HandleGetActiveTask(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -181,7 +180,7 @@ func HandleGetActiveTask(msg *message.Message) (interface{}, error) {
 }
 
 // HandleGetGroupTasks returns list of tasks for a group
-func HandleGetGroupTasks(msg *message.Message) (interface{}, error) {
+func HandleGetGroupTasks(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -201,7 +200,7 @@ func HandleGetGroupTasks(msg *message.Message) (interface{}, error) {
 }
 
 // HandleAddGroup adds the group detailed in msg data
-func HandleAddGroup(msg *message.Message) (interface{}, error) {
+func HandleAddGroup(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -220,7 +219,7 @@ func HandleAddGroup(msg *message.Message) (interface{}, error) {
 }
 
 // HandleUpdateGroup updates group value in database
-func HandleUpdateGroup(msg *message.Message) (interface{}, error) {
+func HandleUpdateGroup(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -247,7 +246,7 @@ func HandleUpdateGroup(msg *message.Message) (interface{}, error) {
 }
 
 // HandleUpdateTask updates task value in database
-func HandleUpdateTask(msg *message.Message) (interface{}, error) {
+func HandleUpdateTask(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -279,7 +278,7 @@ func HandleUpdateTask(msg *message.Message) (interface{}, error) {
 }
 
 // HandleAddTask adds a task for a group using details from msg data
-func HandleAddTask(msg *message.Message) (interface{}, error) {
+func HandleAddTask(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -305,7 +304,7 @@ func HandleAddTask(msg *message.Message) (interface{}, error) {
 }
 
 // HandleStartTask starts a task
-func HandleStartTask(msg *message.Message) (interface{}, error) {
+func HandleStartTask(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -352,7 +351,7 @@ func HandleStartTask(msg *message.Message) (interface{}, error) {
 }
 
 // HandleStopTask stops a task
-func HandleStopTask(msg *message.Message) (interface{}, error) {
+func HandleStopTask(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}
@@ -392,7 +391,7 @@ func HandleStopTask(msg *message.Message) (interface{}, error) {
 }
 
 // HandleGetUsage handle request for usage statistics
-func HandleGetUsage(msg *message.Message) (interface{}, error) {
+func HandleGetUsage(msg *app.Message) (interface{}, error) {
 	if gState.db == nil {
 		return nil, fmt.Errorf("no database")
 	}

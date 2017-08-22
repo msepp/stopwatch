@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/msepp/stopwatch/model"
+	model "github.com/msepp/stopwatch/stopwatchmodel"
 )
 
 const dateFmt = "2006-01-02"
