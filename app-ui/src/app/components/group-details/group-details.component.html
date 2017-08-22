@@ -8,7 +8,7 @@
       <input mdInput placeholder="Group name" formControlName="name">
       <md-error>Name is required</md-error>
     </md-input-container>
-    <button md-icon-button title="Save"><md-icon>save</md-icon></button>
+    <button md-icon-button color="accent" title="Save"><md-icon>save</md-icon></button>
   </form>
 </div>
 <div class="usageform">
@@ -16,17 +16,17 @@
   <form [formGroup]="usageForm" novalidate (submit)="getUsage()">
     <md-input-container>
       <input mdInput [mdDatepicker]="startDatepicker" placeholder="Start date" formControlName="start">
-      <button mdSuffix [mdDatepickerToggle]="startDatepicker"></button>
+      <button mdSuffix color="primary" [mdDatepickerToggle]="startDatepicker"></button>
       <md-error>Start date is required</md-error>
     </md-input-container>
-    <md-datepicker #startDatepicker></md-datepicker>
+    <md-datepicker color="primary" #startDatepicker></md-datepicker>
     <md-input-container>
       <input mdInput [mdDatepicker]="endDatepicker" placeholder="End date" formControlName="end">
-      <button mdSuffix [mdDatepickerToggle]="endDatepicker"></button>
+      <button mdSuffix color="primary" [mdDatepickerToggle]="endDatepicker"></button>
       <md-error>End date is required</md-error>
     </md-input-container>
-    <md-datepicker #endDatepicker></md-datepicker>
-    <button md-icon-button title="Fetch"><md-icon>receipt</md-icon></button>
+    <md-datepicker color="primary" #endDatepicker></md-datepicker>
+    <button md-icon-button color="primary" title="Fetch"><md-icon>arrow_forward</md-icon></button>
   </form>
 </div>
 <div class="listing">

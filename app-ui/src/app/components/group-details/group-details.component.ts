@@ -36,10 +36,14 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
       name: ['', Validators.required]
     });
 
+    const end: Date = new Date();
+    const start = new Date(end.getTime());
+    start.setDate(start.getDate() - 5);
+
     this.usageForm = this.fb.group({
       id: [0],
-      start: ['', Validators.required],
-      end: ['', Validators.required]
+      start: [start, Validators.required],
+      end: [end, Validators.required]
     });
 
     this.group$ = this.store.select('selectedGroup').subscribe((g: Group) => {

@@ -22,7 +22,45 @@
       flex: 1 1 auto;
       margin-right: 0.5rem;
     }
+
+    & > button {
+      margin-bottom: 0.5rem;
+    }
   }
 
   margin-bottom: 1rem;
+}
+
+.usagereport {
+  overflow: auto;
+  padding: 0 1rem 1rem;
+  &::-webkit-scrollbar {
+    height: 7px;
+  }
+
+  .id {
+    text-align: left;
+  }
+
+  .total {
+    background-color: #eee;
+  }
+
+  th {
+    background-color: #f0f0f0;
+    .total {
+      background-color: #eee;
+    }
+  }
+
+  tfoot td {
+    background-color: #eee;
+    .total {
+      background-color: #ddd;
+    }
+  }
+
+  td, th {
+    padding: 0.5rem;
+  }
 }

@@ -13,18 +13,34 @@ import (
 
 const dateFmt = "2006-01-02"
 
-// Usage is a time usage report. Contains work for one group.
+// Usage is the time used for a date
 type Usage struct {
-	// Daily contains daily usage per cost code.
-	Daily map[string]map[string]model.TaskDuration
-	// Contains total usage per cost code.
-	Total map[string]model.TaskDuration
+	Date string
+	Used model.TaskDuration
 }
 
-func (db *StopwatchDB) GetUsage(group int, start, end time.Time) (*Usage, error) {
+// CostUsage is time used per cost code over a period of time
+type CostUsage struct {
+	CostCode string
+	Usage    []Usage
+	Total    model.TaskDuration
+}
+
+// UsageReport is a time usage report. Contains work for one group.
+type UsageReport struct {
+	// Array with the dates in the report
+	Dates []Usage
+	// CostCodes contains the time used per cost code
+	CostCodes []CostUsage
+	// Combined is the combined total time used
+	Combined model.TaskDuration
+}
+
+func (db *StopwatchDB) GetUsage(group int, start, end time.Time) (*UsageReport, error) {
 	daily := map[string]map[string]model.TaskDuration{}
 	total := map[string]model.TaskDuration{}
-	dates := []string{}
+	dates := []Usage{}
+	combined := model.TaskDuration{}
 
 	tasks := []*model.Task{}
 
@@ -66,7 +82,7 @@ func (db *StopwatchDB) GetUsage(group int, start, end time.Time) (*Usage, error)
 
 	// Generate dates to result.
 	for start.Before(end) {
-		dates = append(dates, start.Format(dateFmt))
+		dates = append(dates, Usage{Date: start.Format(dateFmt)})
 		start = start.AddDate(0, 0, 1)
 	}
 
@@ -106,7 +122,7 @@ func (db *StopwatchDB) GetUsage(group int, start, end time.Time) (*Usage, error)
 				if _, ok := daily[task.CostCode]; !ok {
 					daily[task.CostCode] = map[string]model.TaskDuration{}
 					for _, d := range dates {
-						daily[task.CostCode][d] = model.TaskDuration{}
+						daily[task.CostCode][d.Date] = model.TaskDuration{}
 					}
 				}
 
@@ -121,6 +137,8 @@ func (db *StopwatchDB) GetUsage(group int, start, end time.Time) (*Usage, error)
 				od = total[task.CostCode]
 				od.Add(dur)
 				total[task.CostCode] = od
+
+				combined.Add(dur)
 			}
 
 			// Iterate slices until we hit end.
@@ -130,8 +148,28 @@ func (db *StopwatchDB) GetUsage(group int, start, end time.Time) (*Usage, error)
 		}
 	}
 
-	return &Usage{
-		Daily: daily,
-		Total: total,
-	}, nil
+	rep := UsageReport{
+		Dates:     dates,
+		CostCodes: []CostUsage{},
+		Combined:  combined,
+	}
+
+	// Transform result for easier use in UI
+	for cost, usage := range daily {
+		// Omit tasks that have no time recorded
+		if total[cost].Duration == 0 {
+			continue
+		}
+
+		c := CostUsage{CostCode: cost, Total: total[cost], Usage: []Usage{}}
+
+		for di, date := range rep.Dates {
+			c.Usage = append(c.Usage, Usage{Date: date.Date, Used: usage[date.Date]})
+			rep.Dates[di].Used.Add(usage[date.Date].Duration)
+		}
+
+		rep.CostCodes = append(rep.CostCodes, c)
+	}
+
+	return &rep, nil
 }

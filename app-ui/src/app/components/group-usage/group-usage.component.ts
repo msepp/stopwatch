@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Location } from '@angular/common';
+import { Location, DatePipe } from '@angular/common';
 import { Router, RouterStateSnapshot } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
@@ -19,6 +19,7 @@ export class GroupUsageComponent implements OnInit, OnDestroy {
   public group$: Subscription;
   public minDate = new Date(2017, 7, 1);
   public group: Group;
+  public usage: any = null;
 
   constructor(
     private store: Store<AppState>,
@@ -26,12 +27,12 @@ export class GroupUsageComponent implements OnInit, OnDestroy {
     private router: Router,
     private stopwatch: StopwatchService,
     private fb: FormBuilder,
-    private err: ErrorService
+    private err: ErrorService,
+    private datePipe: DatePipe
   ) { }
 
   ngOnInit() {
     const snapshot: RouterStateSnapshot = this.router.routerState.snapshot;
-    console.log(snapshot);
 
     this.usageForm = this.fb.group({
       id: [snapshot.root.params['id']],
@@ -42,6 +43,7 @@ export class GroupUsageComponent implements OnInit, OnDestroy {
     this.group$ = this.store.select('selectedGroup').subscribe((g: Group) => {
       this.group = g;
       this.usageForm.get('id').setValue(g.id);
+      this.getUsage();
     });
   }
 
@@ -51,6 +53,13 @@ export class GroupUsageComponent implements OnInit, OnDestroy {
 
   public getUsage() {
     if (this.usageForm.valid) {
+      const start = this.datePipe.transform(this.usageForm.get('start').value, 'yyyy-MM-dd');
+      const end = this.datePipe.transform(this.usageForm.get('end').value, 'yyyy-MM-dd');
+
+      this.stopwatch.getUsage(this.group.id, start, end).subscribe(
+        (report: any) => this.usage = report,
+        (e: Error) => this.err.log(e)
+      );
     }
   }
 

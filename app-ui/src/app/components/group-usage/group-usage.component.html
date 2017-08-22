@@ -2,28 +2,57 @@
   <button md-icon-button color="primary" (click)="goBack()"><md-icon>arrow_back</md-icon></button>
 </div>
 <div *ngIf="group; then showTools else loadingTools"></div>
+<div *ngIf="usage; then showUsage else loadingUsage"></div>
 <ng-template #showTools>
   <div class="usageform">
     <div class="mat-subheading-1 list-title">Fetch usage report</div>
     <form [formGroup]="usageForm" novalidate (submit)="getUsage()">
       <md-input-container>
         <input mdInput [mdDatepicker]="startDatepicker" placeholder="Start date" formControlName="start">
-        <button mdSuffix [mdDatepickerToggle]="startDatepicker"></button>
+        <button color="primary" mdSuffix [mdDatepickerToggle]="startDatepicker"></button>
         <md-error>Start date is required</md-error>
       </md-input-container>
-      <md-datepicker #startDatepicker></md-datepicker>
+      <md-datepicker color="primary" #startDatepicker></md-datepicker>
       <md-input-container>
         <input mdInput [mdDatepicker]="endDatepicker" placeholder="End date" formControlName="end">
-        <button mdSuffix [mdDatepickerToggle]="endDatepicker"></button>
+        <button color="primary" mdSuffix [mdDatepickerToggle]="endDatepicker"></button>
         <md-error>End date is required</md-error>
       </md-input-container>
-      <md-datepicker #endDatepicker></md-datepicker>
-      <button md-icon-button title="Fetch"><md-icon>receipt</md-icon></button>
+      <md-datepicker color="primary" #endDatepicker></md-datepicker>
+      <button md-icon-button color="primary" title="Fetch"><md-icon>refresh</md-icon></button>
     </form>
-  </div>
-  <div class="usagereport">
   </div>
 </ng-template>
 <ng-template #loadingTools>
   <md-spinner></md-spinner>
 </ng-template>
+<ng-template #showUsage>
+  <div class="usagereport">
+    <table>
+      <thead>
+        <tr>
+          <th class="id">Task</th>
+          <th *ngFor="let date of usage.Dates">{{date.Date|date:'d.M.'}}</th>
+          <th class="total">Total</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr class="daily">
+          <td class="id">Daily</td>
+          <td *ngFor="let date of usage.Dates">{{date.Used|taskDuration}}</td>
+          <td class="total">{{usage.Combined|taskDuration}}</td>
+        </tr>
+      </tfoot>
+      <tbody>
+        <tr class="cost" *ngFor="let cost of usage.CostCodes">
+          <td class="id">{{cost.CostCode}}</td>
+          <td *ngFor="let d of cost.Usage">{{d.Used|taskDuration}}</td>
+          <td class="total">{{cost.Total|taskDuration}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+<ng-template #loadingUsage>
+  <md-spinner></md-spinner>
+<ng-template>
