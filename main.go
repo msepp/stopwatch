@@ -17,7 +17,6 @@ var gState = struct {
 }{}
 
 func main() {
-
 	// Init new application
 	gState.app = app.New(Asset, RestoreAsset, HandleGUIMessage)
 

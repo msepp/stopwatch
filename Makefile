@@ -117,10 +117,8 @@ RESOURCES_DEPS_COMMON := ${UI_DIR}/ui.asar \
 COMMON_DEPS := Makefile \
                *.go \
                stopwatchdb/*.go \
-               model/*.go \
-               bootstrap/*.go \
-               message/*.go \
-               assets/*.go
+               stopwatchmodel/*.go \
+               stopwatchapp/*.go
 
 # Linker flags for setting version info for config during build.
 LDFLAGS := -X '${ROOT_PKG}/bootstrap.electronVersion=${ELECTRON_VERSION}' \
