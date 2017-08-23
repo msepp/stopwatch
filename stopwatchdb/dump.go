@@ -72,7 +72,7 @@ func (db *StopwatchDB) SetSlice(groupID, taskID int, start, end time.Time) (*mod
 	start = start.UTC()
 	end = end.UTC()
 
-	err = db.db.Update(func(tx *bolt.Tx) error {
+	if err = db.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(BucketSlices))
 		bs := b.Bucket(bytes.Join([][]byte{
 			Itob(groupID),
@@ -88,7 +88,9 @@ func (db *StopwatchDB) SetSlice(groupID, taskID int, start, end time.Time) (*mod
 		}
 
 		return bs.Put([]byte(start.Format(time.RFC3339)), []byte(end.Format(time.RFC3339)))
-	})
+	}); err != nil {
+		return nil, err
+	}
 
 	// Update task time used.
 	t.Used.Duration = t.Used.Duration - oldDuration
@@ -114,7 +116,7 @@ func (db *StopwatchDB) RemoveSlice(groupID, taskID int, start time.Time) (*model
 	}
 
 	start = start.UTC()
-	err = db.db.Update(func(tx *bolt.Tx) error {
+	if err = db.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(BucketSlices))
 		bs := b.Bucket(bytes.Join([][]byte{
 			Itob(groupID),
@@ -132,7 +134,9 @@ func (db *StopwatchDB) RemoveSlice(groupID, taskID int, start time.Time) (*model
 		}
 
 		return bs.Delete([]byte(start.Format(time.RFC3339)))
-	})
+	}); err != nil {
+		return nil, err
+	}
 
 	// Update task time used.
 	t.Used.Duration = t.Used.Duration - oldDuration

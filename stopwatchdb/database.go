@@ -46,7 +46,7 @@ func (db *StopwatchDB) AddTask(group int, task, costcode string) (*model.Task, e
 	var t *model.Task = model.NewTask(group, task, costcode)
 
 	// Generate new task, return task.
-	err := db.db.Update(func(tx *bolt.Tx) error {
+	if err := db.db.Update(func(tx *bolt.Tx) error {
 		bt := tx.Bucket([]byte(BucketTasks)).Bucket(Itob(group))
 
 		// Next task ID
@@ -67,11 +67,10 @@ func (db *StopwatchDB) AddTask(group int, task, costcode string) (*model.Task, e
 
 		// Add new task
 		return bt.Put(Itob(t.ID), buf)
-	})
-
-	if err != nil {
+	}); err != nil {
 		return nil, err
 	}
+
 	return t, nil
 }
 
@@ -84,7 +83,7 @@ func (db *StopwatchDB) AddGroup(group string) (*model.Group, error) {
 	var p *model.Group = &model.Group{Name: group}
 
 	// Generate new group and return it
-	err := db.db.Update(func(tx *bolt.Tx) error {
+	if err := db.db.Update(func(tx *bolt.Tx) error {
 		bp := tx.Bucket([]byte(BucketGroups))
 
 		// get next ID
@@ -103,11 +102,10 @@ func (db *StopwatchDB) AddGroup(group string) (*model.Group, error) {
 		}
 
 		return bp.Put(Itob(p.ID), buf)
-	})
-
-	if err != nil {
+	}); err != nil {
 		return nil, err
 	}
+
 	return p, nil
 }
 
@@ -169,7 +167,7 @@ func (db *StopwatchDB) StartTask(group, task int) (*model.Task, error) {
 	// Find task from slices and make sure last value is an timestamp (key) without
 	// end date (value)
 	var now time.Time
-	err = db.db.Update(func(tx *bolt.Tx) error {
+	if err = db.db.Update(func(tx *bolt.Tx) error {
 		// Create Bucket for task slices
 		sliceID := bytes.Join([][]byte{Itob(group), Itob(task)}, []byte("-"))
 		b := tx.Bucket([]byte(BucketSlices)).Bucket(sliceID)
@@ -188,14 +186,11 @@ func (db *StopwatchDB) StartTask(group, task int) (*model.Task, error) {
 
 		now = time.Now().UTC()
 		return b.Put([]byte(now.Format(time.RFC3339)), []byte{})
-	})
-
-	if err != nil {
+	}); err != nil {
 		return nil, err
 	}
 
 	t.Running = &now
-
 	return t, db.SaveTask(t)
 }
 
@@ -214,7 +209,7 @@ func (db *StopwatchDB) StopTask(group, task int) (*model.Task, error) {
 
 	// Find task from slices and add end date (value) for last entry if not value
 	// is yet set.
-	err = db.db.Update(func(tx *bolt.Tx) error {
+	if err = db.db.Update(func(tx *bolt.Tx) error {
 		// Create Bucket for task slices
 		sliceID := bytes.Join([][]byte{Itob(group), Itob(task)}, []byte("-"))
 		b := tx.Bucket([]byte(BucketSlices)).Bucket(sliceID)
@@ -252,9 +247,7 @@ func (db *StopwatchDB) StopTask(group, task int) (*model.Task, error) {
 		}
 
 		return b.Put(k, []byte(now.Format(time.RFC3339)))
-	})
-
-	if err != nil {
+	}); err != nil {
 		return nil, err
 	}
 
@@ -302,7 +295,7 @@ func (db *StopwatchDB) GetActiveTask() (*model.Task, error) {
 
 	var at model.ActiveTask
 
-	err := db.db.View(func(tx *bolt.Tx) error {
+	if err := db.db.View(func(tx *bolt.Tx) error {
 		bs := tx.Bucket([]byte(BucketState))
 		buf := bs.Get([]byte("activeTask"))
 
@@ -315,9 +308,7 @@ func (db *StopwatchDB) GetActiveTask() (*model.Task, error) {
 		}
 
 		return nil
-	})
-
-	if err != nil {
+	}); err != nil {
 		return nil, err
 	}
 
@@ -377,7 +368,7 @@ func (db *StopwatchDB) ReadTask(group, task int) (*model.Task, error) {
 
 	var res model.Task
 
-	db.db.View(func(tx *bolt.Tx) error {
+	if err := db.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(BucketTasks))
 		bg := b.Bucket(Itob(group))
 		if bg == nil {
@@ -390,7 +381,9 @@ func (db *StopwatchDB) ReadTask(group, task int) (*model.Task, error) {
 		}
 
 		return json.Unmarshal(buf, &res)
-	})
+	}); err != nil {
+		return nil, err
+	}
 
 	return &res, nil
 }
@@ -403,7 +396,7 @@ func (db *StopwatchDB) ReadTasks(group int) ([]*model.Task, error) {
 
 	res := []*model.Task{}
 
-	db.db.View(func(tx *bolt.Tx) error {
+	if err := db.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(BucketTasks))
 		bg := b.Bucket(Itob(group))
 		if bg == nil {
@@ -416,7 +409,9 @@ func (db *StopwatchDB) ReadTasks(group int) ([]*model.Task, error) {
 			res = append(res, &t)
 			return nil
 		})
-	})
+	}); err != nil {
+		return nil, err
+	}
 
 	return res, nil
 }
@@ -446,7 +441,7 @@ func (db *StopwatchDB) ReadHistory() ([]model.Task, error) {
 	}
 
 	var history []model.HistoryTask
-	err := db.db.View(func(tx *bolt.Tx) error {
+	if err := db.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(BucketHistory))
 		buf := b.Get([]byte("usage"))
 		log.Printf("read usage: %s", string(buf))
@@ -457,9 +452,7 @@ func (db *StopwatchDB) ReadHistory() ([]model.Task, error) {
 		// No history yet
 		history = []model.HistoryTask{}
 		return nil
-	})
-
-	if err != nil {
+	}); err != nil {
 		return nil, err
 	}
 
@@ -479,16 +472,17 @@ func (db *StopwatchDB) ReadHistory() ([]model.Task, error) {
 func (db *StopwatchDB) Open(path string) error {
 	var err error
 
-	// if already open...
+	// Don't reopen.
 	if db.db != nil {
 		return nil
 	}
 
-	db.db, err = bolt.Open(path, 0600, &bolt.Options{Timeout: 1 * time.Second})
-	if err != nil {
+	// Open and create if missing.
+	if db.db, err = bolt.Open(path, 0600, &bolt.Options{Timeout: 1 * time.Second}); err != nil {
 		return err
 	}
 
+	// Then create missing buckets.
 	Buckets := []string{
 		BucketState,
 		BucketTasks,
@@ -496,7 +490,6 @@ func (db *StopwatchDB) Open(path string) error {
 		BucketGroups,
 		BucketHistory,
 	}
-
 	for _, Bucket := range Buckets {
 		if err = db.db.Update(func(tx *bolt.Tx) error {
 			_, err = tx.CreateBucketIfNotExists([]byte(Bucket))
