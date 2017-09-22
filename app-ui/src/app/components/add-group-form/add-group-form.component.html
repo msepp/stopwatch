@@ -1,10 +1,10 @@
 <div class="mat-subheading-2">Add group</div>
 <form [formGroup]="group" novalidate (submit)="add()">
   <div class="inputs">
-    <md-input-container>
+    <md-form-field>
       <input mdInput placeholder="Group name" formControlName="name">
       <md-error>Name is required</md-error>
-    </md-input-container>
+    </md-form-field>
   </div>
   <div class="buttons">
     <button md-raised-button color="accent">Add</button>

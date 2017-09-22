@@ -4,28 +4,28 @@
 <div class="nameform">
   <div class="mat-subheading-2 list-title">Change name</div>
   <form [formGroup]="groupForm" novalidate (submit)="saveGroup()">
-    <md-input-container>
+    <md-form-field>
       <input mdInput placeholder="Group name" formControlName="name">
       <md-error>Name is required</md-error>
-    </md-input-container>
+    </md-form-field>
     <button md-icon-button color="accent" title="Save"><md-icon>save</md-icon></button>
   </form>
 </div>
 <div class="usageform">
   <div class="mat-subheading-2 list-title">Fetch usage report</div>
   <form [formGroup]="usageForm" novalidate (submit)="getUsage()">
-    <md-input-container>
+    <md-form-field>
       <input mdInput [mdDatepicker]="startDatepicker" placeholder="Start date" formControlName="start">
-      <button mdSuffix color="primary" [mdDatepickerToggle]="startDatepicker"></button>
+      <md-datepicker-toggle mdSuffix color="primary" [for]="startDatepicker"></md-datepicker-toggle>
       <md-error>Start date is required</md-error>
-    </md-input-container>
-    <md-datepicker color="primary" #startDatepicker></md-datepicker>
-    <md-input-container>
+    </md-form-field>
+    <md-datepicker #startDatepicker></md-datepicker>
+    <md-form-field>
       <input mdInput [mdDatepicker]="endDatepicker" placeholder="End date" formControlName="end">
-      <button mdSuffix color="primary" [mdDatepickerToggle]="endDatepicker"></button>
+      <md-datepicker-toggle mdSuffix color="primary" [for]="endDatepicker"></md-datepicker-toggle>
       <md-error>End date is required</md-error>
-    </md-input-container>
-    <md-datepicker color="primary" #endDatepicker></md-datepicker>
+    </md-form-field>
+    <md-datepicker #endDatepicker></md-datepicker>
     <button md-icon-button color="primary" title="Fetch"><md-icon>arrow_forward</md-icon></button>
   </form>
 </div>

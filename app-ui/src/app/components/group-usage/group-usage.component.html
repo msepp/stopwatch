@@ -7,24 +7,24 @@
   <div class="usageform">
     <div class="mat-subheading-2 list-title">Time used on {{group.name}}</div>
     <form [formGroup]="usageForm" novalidate (submit)="getUsage()">
-      <md-input-container>
+      <md-form-field>
         <input mdInput [mdDatepicker]="startDatepicker" placeholder="Start date" formControlName="start">
-        <button color="primary" mdSuffix [mdDatepickerToggle]="startDatepicker"></button>
+        <md-datepicker-toggle color="primary" mdSuffix [for]="startDatepicker"></md-datepicker-toggle>
         <md-error>Start date is required</md-error>
-      </md-input-container>
-      <md-datepicker color="primary" #startDatepicker></md-datepicker>
-      <md-input-container>
+      </md-form-field>
+      <md-datepicker #startDatepicker></md-datepicker>
+      <md-form-field>
         <input mdInput [mdDatepicker]="endDatepicker" placeholder="End date" formControlName="end">
-        <button color="primary" mdSuffix [mdDatepickerToggle]="endDatepicker"></button>
+        <md-datepicker-toggle color="primary" mdSuffix [for]="endDatepicker"></md-datepicker-toggle>
         <md-error>End date is required</md-error>
-      </md-input-container>
-      <md-datepicker color="primary" #endDatepicker></md-datepicker>
+      </md-form-field>
+      <md-datepicker #endDatepicker></md-datepicker>
       <button md-icon-button color="primary" title="Fetch"><md-icon>refresh</md-icon></button>
     </form>
   </div>
 </ng-template>
 <ng-template #loadingTools>
-  <md-spinner></md-spinner>
+  <md-progress-spinner></md-progress-spinner>
 </ng-template>
 <ng-template #showUsage>
   <div class="usagereport">
@@ -54,5 +54,5 @@
   </div>
 </ng-template>
 <ng-template #loadingUsage>
-  <md-spinner></md-spinner>
+  <md-progress-spinner></md-progress-spinner>
 <ng-template>

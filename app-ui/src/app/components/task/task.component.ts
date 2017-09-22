@@ -5,7 +5,7 @@ import { ErrorService } from '../../services/error.service';
 import { Task } from '../../model';
 
 @Component({
-  selector: 'app-task',
+  selector: 'app-task, [app-task]',
   templateUrl: './task.component.html',
   styleUrls: ['./task.component.less']
 })

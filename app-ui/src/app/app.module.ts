@@ -6,7 +6,16 @@ import { HttpModule } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { MaterialModule, MdDatepickerModule, MdNativeDateModule } from '@angular/material';
+import {
+  MdDatepickerModule,
+  MdNativeDateModule,
+  MdProgressSpinnerModule,
+  MdIconModule,
+  MdInputModule,
+  MdButtonModule,
+  MdSnackBarModule,
+  MdListModule
+ } from '@angular/material';
 import { RouterModule } from '@angular/router';
 import './rxjs-operators';
 
@@ -62,9 +71,14 @@ import { TaskHistoryEffects } from './store/effects/task-history.effects';
     ReactiveFormsModule,
     HttpModule,
     BrowserAnimationsModule,
-    MaterialModule,
     MdDatepickerModule,
     MdNativeDateModule,
+    MdProgressSpinnerModule,
+    MdIconModule,
+    MdInputModule,
+    MdButtonModule,
+    MdSnackBarModule,
+    MdListModule,
     RouterModule.forRoot([
       {path: 'groups', component: GroupsHomeComponent},
       {path: 'group/:id', component: GroupDetailsComponent},

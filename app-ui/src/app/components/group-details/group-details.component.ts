@@ -71,8 +71,8 @@ export class GroupDetailsComponent implements OnInit, OnDestroy {
     if (this.usageForm.valid) {
       this.router.navigate(['/usage', this.usageForm.get('id').value], {
         queryParams: {
-          start: this.usageForm.get('start').value,
-          end: this.usageForm.get('end').value
+          start: this.usageForm.get('start').value.toISOString(),
+          end: this.usageForm.get('end').value.toISOString()
         }
       });
     }
