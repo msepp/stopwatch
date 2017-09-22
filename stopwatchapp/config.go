@@ -166,7 +166,7 @@ func PersistentDataDir() (string, error) {
 		return "", err
 	}
 
-	tgt := filepath.Join(home, "."+prefix, "/"+appVersion)
+	tgt := filepath.Join(home, "."+prefix, appVersion)
 	if err = os.MkdirAll(tgt, 0700); err != nil && os.IsExist(err) == false {
 		return "", err
 	}

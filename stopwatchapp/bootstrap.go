@@ -1,8 +1,12 @@
 package stopwatchapp
 
 import (
+	"io/ioutil"
 	"log"
+	"os"
 	"path"
+	"path/filepath"
+	"strings"
 
 	astilectron "github.com/asticode/go-astilectron"
 )
@@ -102,5 +106,19 @@ func (a *App) Bootstrap() error {
 		a.Window.OpenDevTools()
 	}
 
+	// Clean vendor directory of unnecessary zip-files.
+	if !UseTemp() {
+		files, err := ioutil.ReadDir(filepath.Join(a.assetDir, "vendor/"))
+		if err == nil {
+			for _, finfo := range files {
+				if !finfo.IsDir() && strings.HasSuffix(finfo.Name(), ".zip") {
+					log.Printf("Removing unnecessary resource: %s", filepath.Join(a.assetDir, "vendor/", finfo.Name()))
+					os.Remove(filepath.Join(a.assetDir, "vendor/", finfo.Name()))
+				}
+			}
+		} else {
+			log.Printf("error reading dir: %s", err)
+		}
+	}
 	return nil
 }

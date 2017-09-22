@@ -444,7 +444,6 @@ func (db *StopwatchDB) ReadHistory() ([]model.Task, error) {
 	if err := db.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(BucketHistory))
 		buf := b.Get([]byte("usage"))
-		log.Printf("read usage: %s", string(buf))
 		if buf != nil {
 			return json.Unmarshal(buf, &history)
 		}

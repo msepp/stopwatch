@@ -271,7 +271,7 @@ func HandleUpdateTask(msg *app.Message) (interface{}, error) {
 	// Locate task
 	task, err := gState.db.GetTask(payload.GroupID, payload.TaskID)
 	if err != nil {
-		return nil, fmt.Errorf("task not found", err)
+		return nil, fmt.Errorf("task not found: %s", err)
 	}
 
 	// Save with new name
@@ -385,7 +385,7 @@ func HandleStopTask(msg *app.Message) (interface{}, error) {
 	if activeTask != nil {
 		if activeTask.ID == task.ID && activeTask.GroupID == task.GroupID {
 			if err := gState.db.SetActiveTask(0, 0); err != nil {
-				return nil, fmt.Errorf("unable to clear active task: %s")
+				return nil, fmt.Errorf("unable to clear active task: %s", err)
 			}
 		}
 	}

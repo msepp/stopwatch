@@ -20,6 +20,7 @@ var gState = struct {
 
 func main() {
 	flag.StringVar(&gState.databasePath, "db", "", "database path. If none given, a database is created under users home.")
+	// Init
 	flag.Parse()
 
 	// Init new application

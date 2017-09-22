@@ -17,7 +17,7 @@ type Asset struct {
 // Close method for completing io.Closer
 func (a *Asset) Close() error { return nil }
 
-// New returns an asset from given bytes
+// NewAsset returns an asset from given bytes
 func NewAsset(b []byte) *Asset {
 	return &Asset{Reader: bytes.NewReader(b)}
 }
