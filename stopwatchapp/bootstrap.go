@@ -17,14 +17,16 @@ func (a *App) Bootstrap() error {
 	var err error
 	var hadCrash bool
 
-	// Get directory for placing assets
-	if UseTemp() {
-		a.assetDir, err = TmpDataDir()
-	} else {
-		a.assetDir, err = PersistentDataDir()
-	}
-	if err != nil {
-		return err
+	// If asset dir isn't set, try to determine it.
+	if a.assetDir == "" {
+		if UseTemp() {
+			a.assetDir, err = TmpDataDir()
+		} else {
+			a.assetDir, err = PersistentDataDir()
+		}
+		if err != nil {
+			return err
+		}
 	}
 
 	// Unpack assets
@@ -96,7 +98,7 @@ func (a *App) Bootstrap() error {
 	go a.messageQueueFlusher()
 
 	// Setup handler for GUI messages
-	a.Window.On(astilectron.EventNameWindowEventMessage, a.onWindowMessage())
+	a.Window.OnMessage(a.onWindowMessage())
 
 	// Actually create the window to make it appear.
 	a.Window.Create()

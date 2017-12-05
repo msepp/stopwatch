@@ -46,7 +46,7 @@ export class Astilectron {
     this.log('now ready!', e);
 
     // Setup listener for astilectron messages.
-    astilectron.listen((m) => {
+    astilectron.onMessage((m) => {
       this.zone.run(() => this.onMessage(m));
     });
 
@@ -76,7 +76,7 @@ export class Astilectron {
       id: '' + (++this._msgId)
     };
 
-    astilectron.send(message);
+    astilectron.sendMessage(message);
 
     const sub: Subject<Message> = new Subject();
     this._messages

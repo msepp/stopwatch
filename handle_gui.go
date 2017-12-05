@@ -82,11 +82,7 @@ func HandleOpenDatabase(msg *app.Message) (interface{}, error) {
 	}
 
 	if gState.databasePath == "" {
-		rootdir, err := app.PersistentDataDir()
-		if err != nil {
-			return nil, fmt.Errorf("failed to create database dir: %s", err)
-		}
-
+		rootdir := gState.app.WorkingDir()
 		gState.databasePath = path.Join(rootdir, "data.dat")
 	}
 

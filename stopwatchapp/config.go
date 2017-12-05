@@ -68,6 +68,19 @@ type Dimensions struct {
 	Width  int
 }
 
+// BundledVendorVersions returns versions for vendored packages that are bundled in
+// the binary
+func BundledVendorVersions() VendorVersions {
+	return VendorVersions{
+		Astilectron: &VendorVersionsPackage{Version: astilectronVersion},
+		Electron: map[string]*VendorVersionsPackage{
+			provisionElectronKey(): &VendorVersionsPackage{
+				Version: electronVersion,
+			},
+		},
+	}
+}
+
 // Name returns the application name
 func Name() string {
 	return name

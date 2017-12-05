@@ -29,7 +29,7 @@ func (a *App) messageQueueFlusher() {
 				}
 
 			} else {
-				if err := a.Window.Send(m); err != nil {
+				if err := a.Window.SendMessage(m); err != nil {
 					log.Printf("While sending to client: %s", err)
 				}
 			}

@@ -9,17 +9,17 @@ type MessageHandlerFn func(*Message) (interface{}, error)
 
 // OnWindowMessage creates a handler for incoming EventNameWindowEventMessage
 // events.
-func (a *App) onWindowMessage() func(astilectron.Event) bool {
-	return func(e astilectron.Event) (deleteListener bool) {
+func (a *App) onWindowMessage() astilectron.ListenerMessage {
+	return func(msg *astilectron.EventMessage) interface{} {
 		var err error
 		var res interface{}
 		var req Message
 		var resp *Message
 
-		if err = e.Message.Unmarshal(&req); err != nil {
+		if err = msg.Unmarshal(&req); err != nil {
 			resp = NewError(req.ID, err.Error())
 			a.msgQueue <- *resp
-			return
+			return nil
 		}
 
 		switch req.Key {
@@ -42,6 +42,6 @@ func (a *App) onWindowMessage() func(astilectron.Event) bool {
 
 		// Queue response
 		a.msgQueue <- *resp
-		return
+		return nil
 	}
 }
