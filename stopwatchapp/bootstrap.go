@@ -17,29 +17,23 @@ func (a *App) Bootstrap() error {
 	var err error
 	var hadCrash bool
 
-	// If asset dir isn't set, try to determine it.
-	if a.assetDir == "" {
-		if UseTemp() {
-			a.assetDir, err = TmpDataDir()
-		} else {
-			a.assetDir, err = PersistentDataDir()
-		}
-		if err != nil {
-			return err
-		}
+	// get working dir
+	cwd := a.WorkingDir()
+	if cwd == "" {
+		log.Fatal("Unable to determine working dir")
 	}
 
 	// Unpack assets
-	if err = UnpackEmbeddedAssets(a.assetDir, a.assetRestore); err != nil {
+	if err = UnpackEmbeddedAssets(cwd, a.assetRestore); err != nil {
 		return err
 	}
 
 	// Initialize astilectron
 	a.Renderer, err = astilectron.New(astilectron.Options{
 		AppName:            Name(),
-		AppIconDefaultPath: path.Join(a.assetDir, EmbeddedIconPath()),
-		AppIconDarwinPath:  path.Join(a.assetDir, EmbeddedIconPath()),
-		BaseDirectoryPath:  a.assetDir,
+		AppIconDefaultPath: path.Join(cwd, EmbeddedIconPath()),
+		AppIconDarwinPath:  path.Join(cwd, EmbeddedIconPath()),
+		BaseDirectoryPath:  cwd,
 	})
 	if err != nil {
 		return err
@@ -74,14 +68,14 @@ func (a *App) Bootstrap() error {
 
 	// Create main window
 	wd := WindowSize()
-	if a.Window, err = a.Renderer.NewWindow(path.Join(a.assetDir, EmbeddedUIMountPoint()), &astilectron.WindowOptions{
+	if a.Window, err = a.Renderer.NewWindow(path.Join(cwd, EmbeddedUIMountPoint()), &astilectron.WindowOptions{
 		Center:    astilectron.PtrBool(true),
 		Height:    astilectron.PtrInt(wd.Height),
 		Width:     astilectron.PtrInt(wd.Width),
 		MinHeight: astilectron.PtrInt(wd.Height),
 		MinWidth:  astilectron.PtrInt(wd.Width),
 		Title:     astilectron.PtrStr(Name()),
-		Icon:      astilectron.PtrStr(path.Join(a.assetDir, EmbeddedIconPath())),
+		Icon:      astilectron.PtrStr(path.Join(cwd, EmbeddedIconPath())),
 		WebPreferences: &astilectron.WebPreferences{
 			DevTools:        &devTools,
 			DefaultEncoding: astilectron.PtrStr("utf-8"),
@@ -110,7 +104,7 @@ func (a *App) Bootstrap() error {
 
 	// Clean vendor directory of unnecessary zip-files.
 	if !UseTemp() {
-		files, err := ioutil.ReadDir(filepath.Join(a.assetDir, "vendor/"))
+		files, err := ioutil.ReadDir(filepath.Join(cwd, "vendor/"))
 		if err == nil {
 			for _, finfo := range files {
 				if !finfo.IsDir() && strings.HasSuffix(finfo.Name(), ".zip") {

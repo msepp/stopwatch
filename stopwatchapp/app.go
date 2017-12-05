@@ -1,7 +1,6 @@
 package stopwatchapp
 
 import (
-	"log"
 	"os"
 	"sync"
 
@@ -23,27 +22,11 @@ type App struct {
 
 // New returns a new initialized application ready for boostrapping.
 func New(dataFn astilectron.Disembedder, restoreFn AssetRestoreFn, msgFn MessageHandlerFn) *App {
-	var err error
-
-	a := &App{
+	return &App{
 		assetData:    dataFn,
 		assetRestore: restoreFn,
 		msgHandler:   msgFn,
 	}
-
-	// If asset dir isn't set, try to determine it.
-	if a.assetDir == "" {
-		if UseTemp() {
-			a.assetDir, err = TmpDataDir()
-		} else {
-			a.assetDir, err = PersistentDataDir()
-		}
-		if err != nil {
-			log.Printf("error reading default dir: %s", err)
-		}
-	}
-
-	return a
 }
 
 // Wait waits until process has finished.
@@ -93,7 +76,8 @@ func (a *App) SetWorkingDir(dirname string) {
 	a.assetDir = dirname
 }
 
-// WorkingDir returns current working dir
+// WorkingDir returns current working dir. Attempts to resolve and create a
+// working dir on first use if no dir is yet set.
 func (a *App) WorkingDir() string {
 	// If asset dir isn't set, try to determine it.
 	if a.assetDir == "" {
